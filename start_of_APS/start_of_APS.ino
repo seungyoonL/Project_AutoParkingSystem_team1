@@ -22,15 +22,15 @@ void loop() {
   //front_motor180();
   light_sensor_servo_loop(); //ADC 돌려서 값 보기
   delay(500); // 텀은 0.5초 정도
-  if (value > 1010 & value <1015){ 
+  if (value > 1010 & value <1018){ 
     delay(2000);               // 2초 있다가 앞바퀴 2개 완전히 돌리기
     front_motor180();
     rear_motor180();
     delay(5000);
     while(value > 1010){
-      uint8_t value2 = 1;    // 다른 값(value2)를 받아서 그값이 어떤 조건 만족하면 무한루프 탈출하고 바퀴각도 0도로 복원
-      if (value2 == 1){      // 다른 값이 어떤 조건 만족못하면 무한루프 탈출못하고 계속 180도 유지.
-        value = 0;
+      light_sensor_servo_loop();   // 계속해서 그 조건이 유지되면 바퀴 완전히 돌린거 계속 쭉 유지한다
+      if (value < 1010){           // 만약에 그 조건이 유지되지 못하면 value를 초기화 함으로써 와일문을 탈출함
+        value = 0;                 
       }
     }
     front_motor0();         // 탈출 후 0도로 만들고 내가 관찰하는 value 값이 저 조건 만족안하면 계속 0도 유지
@@ -118,3 +118,7 @@ void light_sensor_servo_loop() {
   value = ADC;
   Serial.println(value);
 }
+
+//개념 생각한것
+//일단 초음파센서로 부터 받아오는값 10번이상(차 길이 이상, 평행주차 가능)찍히면, 차폭만큼만 일단 서보모터 돌아가게 하고 dc모터 돌어갈 시간을 준다.
+// 초음파 센서로부터 읽히는 그 값 자체도 받아와서 주차를 한 후에 부족함이 있으면 그 값을 실시간으로 계속 보면서 서보모터 바퀴각을 180도 풀지 말지 결정한다. 
