@@ -1,17 +1,20 @@
-// 차량 전장, 전폭 설정
 // 초음파 센서 Trig, Echo 핀 번호 설정
-
 #define pinTrig_front     0x08
 #define pinEcho_front     0x04
-#define pinTrig_back     0x40
-#define pinEcho_back     0x20
-#define pinTrig_left     0x02
-#define pinEcho_left     0x01
+#define pinTrig_back      0x40
+#define pinEcho_back      0x20
+#define pinTrig_left      0x02
+#define pinEcho_left      0x01
 #define pinTrig_right     0x10
 #define pinEcho_right     0x08
 
-#define Car_Length    30
-#define Car_Width     10
+// 차량 전장, 전폭 설정
+#define Car_Length        30
+#define Car_Width         5
+
+// 측정 주기, 차량 속도
+#define Time_Interval     1000
+#define Velocity_MeterperSecond   1
 
 // 전방 거리 측정
 double distanceCm_front() {
@@ -77,8 +80,8 @@ double distanceCm_right() {
   return cm;
 }
 
-// Serial moritor 에 거리, 횟수 표시
-void showDistance(double d_1, double d_2, double d_3, double d_4, uint8_t c_left, uint8_t c_right) {
+// Serial moritor 에 거리, 횟수, 폭 표시
+void showDistance(double d_1, double d_2, double d_3, double d_4, uint8_t c_left, uint8_t c_right, uint16_t w_left, uint16_t w_right) {
   Serial.print("front: ");
   Serial.print(d_1);
   Serial.print("   ");
@@ -97,19 +100,32 @@ void showDistance(double d_1, double d_2, double d_3, double d_4, uint8_t c_left
   Serial.print("count_right: ");
   Serial.println(c_right);
 
+  Serial.print("width_left: ");
+  Serial.print(w_left);
+  Serial.print("   ");
+  Serial.print("width_right: ");
+  Serial.println(w_right);
+
   Serial.println();
 }
 
 // 횟수 카운트
-uint8_t calculateWidth(uint8_t length, uint8_t cnt) {
+uint8_t countWidth(uint8_t length, uint8_t cnt) {
   if(length > Car_Length) {
-    cnt ++ ;
+    cnt += 1;
+
+    // if(cnt * Time_Interval * Velocity_MeterperSecond > Car_Width * 1000) {
+    // return cnt * Time_Interval * Velocity_MeterperSecond;
+    // }
   }
   else if(length < Car_Length) {
     cnt = 0;
-  }
 
+    // return 0;
+  }
+  // width = cnt * Time_Interval * Velocity_MeterperSecond;
   return cnt;
+  // return width;
 }
 
 // Trig는 출력으로, Echo는 입력으로 설정
@@ -131,15 +147,32 @@ void loop() {
   static uint8_t count_left = 0;
   static uint8_t count_right = 0;
 
+  uint16_t widthmm_left;
+  uint16_t widthmm_right;
+
   double distance_front = distanceCm_front();
   double distance_back = distanceCm_back();
   double distance_left = distanceCm_left();
   double distance_right = distanceCm_right();
 
-  count_left = calculateWidth(distance_left, count_left);
-  count_right = calculateWidth(distance_right, count_right);
+  count_left = countWidth(distance_left, count_left);
+  count_right = countWidth(distance_right, count_right);
 
-  showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right);
+  // 탐지 공간의 폭 계산
+  widthmm_left = count_left * Time_Interval * Velocity_MeterperSecond;
+  widthmm_right = count_right * Time_Interval * Velocity_MeterperSecond;
 
-  delay(1000);
+  showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, widthmm_left, widthmm_right);
+
+  delay(Time_Interval);
 }
+
+// 탐지 공간이 차폭보다 크면 1 반환
+// bool decideParking(uint16_t width) {
+//   if(width > Car_Width) {
+//     return True;
+//   }
+//   else {
+//     return False;
+//   }
+// }
