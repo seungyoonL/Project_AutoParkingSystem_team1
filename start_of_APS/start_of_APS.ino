@@ -2,6 +2,7 @@
 #define REAR_SERVO 0x02
 
 volatile uint16_t value = 0;
+uint8_t mode = 0;
 
 void setup() {
   // 마프 1조 Auto Parking System 팀플 시작!
@@ -17,36 +18,64 @@ void setup() {
 }
 
 void loop() {
+  if(mode == 0){
   //front_motor0();
   //front_motor90();
   //front_motor180();
-  light_sensor_servo_loop(); //ADC 돌려서 값 보기
-  delay(500); // 텀은 0.5초 정도
-  if (value > 1010 & value <1018){ 
-    delay(2000);               // 2초 있다가 앞바퀴 2개 완전히 돌리기
-    front_motor180();
-    rear_motor180();
-    delay(5000);
-    while(value > 1010){
-      light_sensor_servo_loop();   // 계속해서 그 조건이 유지되면 바퀴 완전히 돌린거 계속 쭉 유지한다
-      if (value < 1010){           // 만약에 그 조건이 유지되지 못하면 value를 초기화 함으로써 와일문을 탈출함
-        value = 0;                 
+    light_sensor_servo_loop(); //ADC 돌려서 값 보기
+    delay(500); // 텀은 0.5초 정도
+    if (value > 990 & value <1010){ 
+      delay(2000);               // 2초 있다가 앞바퀴 2개 완전히 돌리기
+      front_motor180();
+      rear_motor180();
+      delay(5000);
+      while(value > 990){
+        light_sensor_servo_loop();   // 계속해서 그 조건이 유지되면 바퀴 완전히 돌린거 계속 쭉 유지한다
+        if (value < 990){           // 만약에 그 조건이 유지되지 못하면 value를 초기화 함으로써 와일문을 탈출함
+          value = 0;                 
+        }
       }
+      front_motor0();         // 탈출 후 0도로 만들고 내가 관찰하는 value 값이 저 조건 만족안하면 계속 0도 유지
+      rear_motor0();
     }
-    front_motor0();         // 탈출 후 0도로 만들고 내가 관찰하는 value 값이 저 조건 만족안하면 계속 0도 유지
-    rear_motor0();
+    else if (value > 1010 & value < 1050){    // 2초 후 앞바퀴 완전히 돌리고 DC모터가 동작할 시간 2.5초 주고 다시 0도 만들기
+      delay(2000);
+      front_motor180();
+      rear_motor180();
+      delay(2500);
+      front_motor0(); // 이때 0도 만들고 내가 관찰하는 값이 저 조건 아니면 계속 0도 유지
+      rear_motor0();
+    }
+    else {
+      front_motor0(); // 아무 조건도 만족못하면 그냥 0도 유지
+      rear_motor0();
+    }
   }
-  else if (value > 1014 & value < 1050){    // 2초 후 앞바퀴 완전히 돌리고 DC모터가 동작할 시간 2.5초 주고 다시 0도 만들기
-    delay(2000);
-    front_motor180();
-    rear_motor180();
-    delay(2500);
-    front_motor0(); // 이때 0도 만들고 내가 관찰하는 값이 저 조건 아니면 계속 0도 유지
-    rear_motor0();
-  }
-  else {
-    front_motor0(); // 아무 조건도 만족못하면 그냥 0도 유지
-    rear_motor0();
+
+// T자 주차 모드 mode=1
+  if (mode == 1){
+    light_sensor_servo_loop(); //ADC 돌려서 값 보기
+    delay(500); // 텀은 0.5초 정도
+    if (value > 990 & value <1010){ 
+      delay(2000);               // 2초 있다가 앞바퀴 2개 완전히 돌리기
+      front_motor90();
+      rear_motor90();
+      delay(5000);            // 차량이 90도 회전할 시간을 5초 준다
+      front_motor0();         // 탈출 후 0도로 만들고 내가 관찰하는 value 값이 저 조건 만족안하면 계속 0도 유지
+      rear_motor0();
+    }
+    else if (value > 1010 & value < 1050){    // 2초 후 앞바퀴 완전히 돌리고 DC모터가 동작할 시간 2.5초 주고 다시 0도 만들기
+      delay(2000);
+      front_motor180();
+      rear_motor180();
+      delay(2500);
+      front_motor0(); // 이때 0도 만들고 내가 관찰하는 값이 저 조건 아니면 계속 0도 유지
+      rear_motor0();
+    }
+    else {
+      front_motor0(); // 아무 조건도 만족못하면 그냥 0도 유지
+      rear_motor0();
+    }
   }
 }
 
