@@ -16,6 +16,19 @@
 #define Time_Interval     1000
 #define Velocity_MeterperSecond   1
 
+// 초음파 센서 핀 초기 설정
+void ultraSonic_setup() {
+  DDRD |= pinTrig_front;
+  DDRD |= pinTrig_back;
+  DDRB |= pinTrig_left;
+  DDRB |= pinTrig_right;
+
+  DDRD &= ~pinEcho_front;
+  DDRD &= ~pinEcho_back;
+  DDRB &= ~pinEcho_left;
+  DDRB &= ~pinEcho_right;
+}
+
 // 전방 거리 측정
 double distanceCm_front() {
   PORTD &= ~pinTrig_front;
@@ -132,15 +145,7 @@ uint8_t countWidth(uint8_t length, uint8_t cnt) {
 void setup() {
   Serial.begin(9600);
 
-  DDRD |= pinTrig_front;
-  DDRD |= pinTrig_back;
-  DDRB |= pinTrig_left;
-  DDRB |= pinTrig_right;
-
-  DDRD &= ~pinEcho_front;
-  DDRD &= ~pinEcho_back;
-  DDRB &= ~pinEcho_left;
-  DDRB &= ~pinEcho_right;
+  ultraSonic_setup();
 }
 
 void loop() {
@@ -168,11 +173,11 @@ void loop() {
 }
 
 // 탐지 공간이 차폭보다 크면 1 반환
-// bool decideParking(uint16_t width) {
-//   if(width > Car_Width) {
-//     return True;
-//   }
-//   else {
-//     return False;
-//   }
-// }
+bool decideParking(uint16_t width) {
+  if(width > Car_Width) {
+    return True;
+  }
+  else {
+    return False;
+  }
+}
