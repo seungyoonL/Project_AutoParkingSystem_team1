@@ -139,9 +139,9 @@ void front_motor90() { // 서보모터 90도
 void front_motor180() { // 서보모터 180도
     for(uint8_t i = 0; i < 50; i++) {
     PORTB |= FRONT_SERVO;
-    delayMicroseconds(2500);
+    delayMicroseconds(1000);
     PORTB &=~ FRONT_SERVO;
-    delayMicroseconds(17500);
+    delayMicroseconds(19000);
   };
 }
 
