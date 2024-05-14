@@ -175,9 +175,9 @@ void loop() {
 // 탐지 공간이 차폭보다 크면 1 반환
 bool decideParking(uint16_t width) {
   if(width > Car_Width) {
-    return True;
+    return 1;
   }
   else {
-    return False;
+    return 0;
   }
 }

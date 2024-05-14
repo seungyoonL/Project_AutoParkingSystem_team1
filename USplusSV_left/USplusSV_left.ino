@@ -16,7 +16,7 @@
 #define Car_Width         8
 
 // 측정 주기, 차량 속도
-#define Time_Interval     200
+#define Time_Interval     1000
 #define Velocity_MeterperSecond   1
 
 #define Specific_Count    5
@@ -88,14 +88,16 @@ void loop() {
     double update_distance = distanceCm_left();
     Serial.print("update_distance: ");
     Serial.println(update_distance);
-    while(update_distance > 2){
+    while(update_distance > 5){
       // uint16_t* new_update = detectCm_4direction();
       // update = detectCm_4direction();
       double new_update_distance = distanceCm_left();
       Serial.print("new_update_distance: ");
       Serial.println(new_update_distance);
       // light_sensor_servo_loop();   // 계속해서 그 조건이 유지되면 바퀴 완전히 돌린거 계속 쭉 유지한다
-      if (new_update_distance < 2){           // 만약에 그 조건이 유지되지 못하면 value를 초기화 함으로써 와일문을 탈출함
+      if (new_update_distance < 5){           // 만약에 그 조건이 유지되지 못하면 value를 초기화 함으로써 와일문을 탈출함
+        count_left = 0;
+        // count_right = 0;
         break;                 
       }
     }
@@ -263,6 +265,7 @@ double distanceCm_right() {
   double duration = pulseIn(13, HIGH);
 
   double cm = (duration/2) * 0.0343;
+
   return cm;
 }
 
@@ -291,19 +294,22 @@ void showDistance(double d_1, double d_2, double d_3, double d_4, uint8_t c_left
   Serial.print(d_3);
   Serial.print("   ");
   Serial.print("right: ");
-  Serial.println(d_4);
+  Serial.print(d_4);
+  Serial.println("");
 
   Serial.print("count_left: ");
   Serial.print(c_left);
   Serial.print("   ");
   Serial.print("count_right: ");
-  Serial.println(c_right);
+  Serial.print(c_right);
+  Serial.println("");
 
   Serial.print("length_left: ");
   Serial.print(l_left);
   Serial.print("   ");
   Serial.print("length_right: ");
-  Serial.println(l_right);
+  Serial.print(l_right);
+  Serial.println("");
 
   Serial.println();
 }
