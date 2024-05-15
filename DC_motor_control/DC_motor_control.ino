@@ -1,6 +1,9 @@
 // 모터 기본 제어핀 2개
-int frontDC1 = 0x01;
-int frontDC2 = 0x02;
+int frontDC1 = 0x04;
+int frontDC2 = 0x08;
+
+int A = 0;
+int B = 0;
 
 // 모터 PWM 제어핀 1개 
 int frontDCpwm = 0x80;
@@ -38,9 +41,15 @@ void loop() {
   for(uint8_t i = 0; i < 5; i++){   // 모터를 앞으로 일정시간동안 돌아가게 한다음
     DCpwmspeed();
   };
-  delay(1000);                      // 1초간 쉬게 하기.
-  for(uint8_t i = 0; i < 5; i++){   // 모터 뒤로 일정시간 돌아가게 한다음
-    DCpwmspeedback();
+  if (A == 0){
+    for(uint8_t i = 0; i < 5; i++){   // 모터를 앞으로 일정시간동안 돌아가게 한다음
+      DCpwmspeedback();
+      if (B == 0) break;
+    };
   };
-  delay(1000);                      // 1초간 쉬게 하기.
+  // delay(1000);                      // 1초간 쉬게 하기.
+  // for(uint8_t i = 0; i < 5; i++){   // 모터 뒤로 일정시간 돌아가게 한다음
+  //   DCpwmspeedback();
+  // };
+  // delay(1000);                      // 1초간 쉬게 하기.
 }
