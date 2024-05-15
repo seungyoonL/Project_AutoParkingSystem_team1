@@ -12,16 +12,15 @@
 #define pinEcho_right     0x20
 
 // 차량 전장, 전폭 설정
-#define Car_Length        30
-#define Car_Width         8
+#define Car_Length        300
+#define Car_Width         80
 
 // 측정 주기, 차량 속도
-#define Time_Interval     1000
+#define Time_Interval     20
+
 #define Velocity_MeterperSecond   1
 
-#define Specific_Count    5
-
-volatile uint16_t value = 0;
+#define Specific_Count    50
 
 void setup() {
   // 마프 1조 Auto Parking System 팀플 시작!
@@ -44,10 +43,15 @@ void loop() {
   uint16_t lengthmm_left;
   uint16_t lengthmm_right;
 
-  double distance_front = distanceCm_front();
-  double distance_back = distanceCm_back();
-  double distance_left = distanceCm_left();
-  double distance_right = distanceCm_right();
+  uint16_t distance_front;
+  uint16_t distance_back;
+  uint16_t distance_left;
+  uint16_t distance_right;
+
+  distance_front = distanceMm_front();
+  distance_back = distanceMm_back();
+  distance_left = distanceMm_left();
+  distance_right = distanceMm_right();
 
   count_left = countLength(distance_left, count_left);
   count_right = countLength(distance_right, count_right);
@@ -66,14 +70,13 @@ void loop() {
     delay(2000);               // 2초 있다가 앞바퀴 2개 완전히 돌리기
     front_motor180();
     rear_motor180();
-    delay(5000);
 
-    double update_distance = distanceCm_left();
-    while(update_distance > 5){
-      double new_update_distance = distanceCm_left();
+    uint16_t update_distance = distanceMm_left();
+    while(update_distance > 50){
+      uint16_t new_update_distance = distanceMm_left();
       Serial.print("new_update_distance: ");
       Serial.println(new_update_distance);
-      if (new_update_distance < 5){           // 만약에 그 조건이 유지되지 못하면 value를 초기화 함으로써 와일문을 탈출함
+      if (new_update_distance < 50){           // 만약에 그 조건이 유지되지 못하면 value를 초기화 함으로써 와일문을 탈출함
         count_left = 0;
         break;                 
       }
@@ -154,8 +157,8 @@ void ultraSonic_setup() {
   DDRB &= ~pinEcho_right;
 }
 
-// 전방 거리 측정
-double distanceCm_front() {
+// 전방 거리 측정 mm
+uint16_t distanceMm_front() {
   PORTD &= ~pinTrig_front;
   delayMicroseconds(5);
   
@@ -164,14 +167,14 @@ double distanceCm_front() {
 
   PORTD &= ~pinTrig_front;
 
-  double duration = pulseIn(2, HIGH);
+  uint16_t duration = pulseIn(2, HIGH, 100000);
 
-  double cm = (duration/2) * 0.0343;
-  return cm;
+  uint16_t mm = (duration/2) * 0.343;
+  return mm;
 }
 
-// 후방 거리 측정
-double distanceCm_back() {
+// 후방 거리 측정 mm
+uint16_t distanceMm_back() {
   PORTD &= ~pinTrig_back;
   delayMicroseconds(5);
   
@@ -180,14 +183,14 @@ double distanceCm_back() {
 
   PORTD &= ~pinTrig_back;
 
-  double duration = pulseIn(5, HIGH);
+  uint16_t duration = pulseIn(5, HIGH, 100000);
 
-  double cm = (duration/2) * 0.0343;
-  return cm;
+  uint16_t mm = (duration/2) * 0.343;
+  return mm;
 }
 
-// 좌측방 거리 측정
-double distanceCm_left() {
+// 좌측방 거리 측정 mm
+uint16_t distanceMm_left() {
   PORTB &= ~pinTrig_left;
   delayMicroseconds(5);
   
@@ -196,14 +199,14 @@ double distanceCm_left() {
 
   PORTB &= ~pinTrig_left;
 
-  double duration = pulseIn(11, HIGH);
+  uint16_t duration = pulseIn(11, HIGH, 100000);
 
-  double cm = (duration/2) * 0.0343;
-  return cm;
+  uint16_t mm = (duration/2) * 0.343;
+  return mm;
 }
 
-// 우측방 거리 측정
-double distanceCm_right() {
+// 우측방 거리 측정 mm
+uint16_t distanceMm_right() {
   PORTB &= ~pinTrig_right;
   delayMicroseconds(5);
   
@@ -212,15 +215,14 @@ double distanceCm_right() {
 
   PORTB &= ~pinTrig_right;
 
-  double duration = pulseIn(13, HIGH);
+  uint16_t duration = pulseIn(13, HIGH, 100000);
 
-  double cm = (duration/2) * 0.0343;
-
-  return cm;
+  uint16_t mm = (duration/2) * 0.343;
+  return mm;
 }
 
 // Serial moritor 에 거리, 횟수, 폭 표시
-void showDistance(double d_1, double d_2, double d_3, double d_4, uint8_t c_left, uint8_t c_right, uint16_t l_left, uint16_t l_right) {
+void showDistance(uint16_t d_1, uint16_t d_2, uint16_t d_3, uint16_t d_4, uint8_t c_left, uint8_t c_right, uint16_t l_left, uint16_t l_right) {
   Serial.print("front: ");
   Serial.print(d_1);
   Serial.print("   ");
@@ -253,17 +255,17 @@ void showDistance(double d_1, double d_2, double d_3, double d_4, uint8_t c_left
 
 // 횟수 카운트
 uint8_t countLength(uint8_t width, uint8_t cnt) {
-  if(width > Car_Width + 2) {
+  if(width > Car_Width + 30) {
     cnt += 1;
   }
-  else if(width < Car_Width + 2) {
+  else if(width < Car_Width + 30) {
     cnt = 0;
   }
   return cnt;
 }
 
 bool decideParking(uint16_t length) {
-  if(length >= Specific_Count * Time_Interval) {
+  if(length >= Specific_Count * Time_Interval * Velocity_MeterperSecond) {
     return 1;
   }
   else {
