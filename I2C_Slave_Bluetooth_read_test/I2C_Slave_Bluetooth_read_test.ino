@@ -8,7 +8,6 @@ void slave_write_data(uint8_t data);
 
 
 void setup() {
-  // Serial.begin(9600);
   slave_setup();
 }
 

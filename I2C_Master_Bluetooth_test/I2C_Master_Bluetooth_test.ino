@@ -37,27 +37,25 @@ void loop() {
     }
 
     if (received != '\n' & data != 99){
-
-      Serial.print("Data: ");
-      Serial.println(data);
-
       if (data == 0){
         master_read_start();
         master_read_address(slave1);
         master_read_data(&data);
         master_read_stop();
 
+        Serial.print("Data: ");
         Serial.println(data);
-        
       } else{
         master_write_start();
         master_write_address(slave1);
         master_write_data(data);
         master_write_stop();
+
+        Serial.print("Data: ");
+        Serial.println(data);
       }
     }
   }
-  // delay(1000);
 }
 
 void master_setup() {
@@ -110,7 +108,7 @@ void master_read_data(uint8_t* p_data) {
   while ((TWSR & 0xF8) != 0x58){
     TWCR |= (1 << TWINT); // 통신 시작
     while (!(TWCR & (1 << TWINT))); // TWINT가 다시 1 될때까지 기다림
-  } // TWSR에 0x50 입력될 때까지 기다림
+  } // TWSR에 0x58 입력될 때까지 기다림
   *p_data = TWDR; // data에 TWDR값 입력
 }
 
