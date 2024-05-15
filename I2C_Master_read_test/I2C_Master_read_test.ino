@@ -67,7 +67,9 @@ void master_write_stop() {
 void master_read_start() {
   TWCR |= (1 << TWINT) | (1 << TWSTA); // START 보내기 및 통신 시작
   while (!(TWCR & (1 << TWINT))); // TWINT가 다시 1 될때까지 기다림
-  while ((TWSR & 0xF8) != 0x08); // TWSR에 0x08 입력될 때까지 기다림
+  while ((TWSR & 0xF8) != 0x08){
+    Serial.println("Error1");
+  } // TWSR에 0x08 입력될 때까지 기다림
 }
 
 void master_read_address(uint8_t slave_address) {
@@ -75,13 +77,20 @@ void master_read_address(uint8_t slave_address) {
   TWCR &= ~(1 << TWSTA); // START 비트 0으로 만들어줌
   TWCR |= (1 << TWINT); // 통신 시작
   while (!(TWCR & (1 << TWINT))); // TWINT가 다시 1 될때까지 기다림
-  while ((TWSR & 0xF8) != 0x40); // TWSR에 0x40 입력될 때까지 기다림
+  while ((TWSR & 0xF8) != 0x40){
+    Serial.println("Error2");
+    Serial.println(TWSR & 0xF8);
+    TWCR |= (1 << TWINT); // 통신 시작
+      while (!(TWCR & (1 << TWINT)));
+  } // TWSR에 0x40 입력될 때까지 기다림
 }
 
 void master_read_data(uint8_t* p_data) {
   TWCR |= (1 << TWINT); // 통신 시작
   while (!(TWCR & (1 << TWINT))); // TWINT가 다시 1 될때까지 기다림
-  while ((TWSR & 0xF8) != 0x58); // TWSR에 0x50 입력될 때까지 기다림 // 안되면 0x58
+  while ((TWSR & 0xF8) != 0x58){
+    Serial.println("Error3");
+  } // TWSR에 0x50 입력될 때까지 기다림 // 안되면 0x58
   *p_data = TWDR; // data에 TWDR값 입력
 }
 

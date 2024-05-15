@@ -20,7 +20,7 @@ void loop() {
   uint8_t received = 99; // dummy data
   master_write_start();
   master_write_address(slave1);
-  master_write_data(&received);
+  master_write_data(received);
   master_write_stop();
 }
 
@@ -41,7 +41,10 @@ void master_write_address(uint8_t slave_address) {
   TWCR &= ~(1 << TWSTA); // START 비트 0으로 만들어줌
   TWCR |= (1 << TWINT); // 통신 시작
   while (!(TWCR & (1 << TWINT))); // TWINT가 다시 1 될때까지 기다림
-  while ((TWSR & 0xF8) != 0x18); // TWSR에 0x18 입력될 때까지 기다림
+  while ((TWSR & 0xF8) != 0x18){
+    Serial.println("Error2");
+    delay(1000);
+  }; // TWSR에 0x18 입력될 때까지 기다림
 }
 
 void master_write_data(uint8_t data) {
