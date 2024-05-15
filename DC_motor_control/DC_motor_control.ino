@@ -49,7 +49,7 @@ void loop() {
       DCpwmspeedback();
     };
     DCpwmspeedstop1500();      // 서보모터 완전히 돌아갈 1.5초동안 멈추기
-    for(uint8_t i = 0; i < 5; i++){
+    for(uint8_t i = 0; i < 100; i++){
       DCpwmspeedback();             // 차 점점 주차 시키다가 
       if(B == 0){                        // 간견 3cm 미만으로 떨어지는 조건 만족하자 마자
         while(1) DCpwmspeedstop1500();   // 차 멈추는 함수 무한루프 돌림으로써 주차 완료시킴.

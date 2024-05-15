@@ -21,13 +21,56 @@
 
 #define Specific_Count    5
 
-volatile uint16_t value = 0;
+// 모터 기본 제어핀 2개
+#define frontDC1 0x04
+#define frontDC2 0x08
+// 모터 PWM 제어핀 1개
+#define frontDCpwm 0x80
+
+// volatile uint16_t value = 0;
+uint8_t AAA = 0;
+
+void DCpwmspeed() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
+  PORTD |= frontDC1;
+  PORTD &=~ frontDC2;
+  for(uint8_t i = 0; i < 250; i++){
+    PORTD |= frontDCpwm;
+    delayMicroseconds(1900);
+    PORTD &=~ frontDCpwm;
+    delayMicroseconds(100);
+  };
+  delay(5);
+}
+void DCpwmspeedback() {   //PWM 속도 적당히 조절 후 뒤로 돌리기
+  PORTD |= frontDC2;
+  PORTD &=~ frontDC1;
+  for(uint8_t i = 0; i < 50; i++){
+    PORTD |= frontDCpwm;
+    delayMicroseconds(19000);
+    PORTD &=~ frontDCpwm;
+    delayMicroseconds(1000);
+  };
+  delay(5);
+}
+void DCpwmspeedstop1500() {   //PWM 속도 적당히 조절하여 가만히 있도록 하기
+  PORTD &=~ frontDC2;
+  PORTD &=~ frontDC1;
+  delay(1500);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
 
 void setup() {
   // 마프 1조 Auto Parking System 팀플 시작!
   
   DDRB |= FRONT_SERVO; // 서보모터 PWM(주황색) 핀을 출력으로 연결시킴
   DDRB |= REAR_SERVO;
+
+  DDRD |= frontDC2;    // DC모터 앞쪽,오른쪽 제어 핀 출력으로 연결시킴
+  DDRD |= frontDC1; 
   
   Serial.begin(9600);
   // light_sensor_servo(); // 조도센서 기본설정 셋업
@@ -36,6 +79,7 @@ void setup() {
   rear_motor0();
 
   ultraSonic_setup();
+  
 }
 
 void loop() {
@@ -78,33 +122,48 @@ void loop() {
   //front_motor180();
   // light_sensor_servo_loop(); //ADC 돌려서 값 보기
   // delay(500); // 텀은 0.5초 정도
+
+  DCpwmspeed();
+  
   if (decision == 1){ 
-    delay(2000);               // 2초 있다가 앞바퀴 2개 완전히 돌리기
+    for(uint8_t i = 0; i < 8; i++){
+      DCpwmspeedback();
+    };
+    // delay(2000);               // 2초 있다가 앞바퀴 2개 완전히 돌리기
     front_motor180();
     rear_motor180();
-    delay(5000);
+
+    //delay(5000);
 
     // uint16_t* update = detectCm_4direction();
     double update_distance = distanceCm_left();
     Serial.print("update_distance: ");
     Serial.println(update_distance);
-    while(update_distance > 2){
-      // uint16_t* new_update = detectCm_4direction();
+    while(update_distance > 5){
+      for(uint8_t i = 0; i < 100; i++){
+        DCpwmspeedback();
+              // uint16_t* new_update = detectCm_4direction();
       // update = detectCm_4direction();
       double new_update_distance = distanceCm_left();
       Serial.print("new_update_distance: ");
       Serial.println(new_update_distance);
       // light_sensor_servo_loop();   // 계속해서 그 조건이 유지되면 바퀴 완전히 돌린거 계속 쭉 유지한다
-      if (new_update_distance < 2){           // 만약에 그 조건이 유지되지 못하면 value를 초기화 함으로써 와일문을 탈출함
-        break;                 
+      if (new_update_distance < 5){           // 만약에 그 조건이 유지되지 못하면 value를 초기화 함으로써 와일문을 탈출함
+        AAA = 1;
+        break;      
+       }
+      }
+    if(AAA == 1){
+      DCpwmspeedstop1500();
+      front_motor0();
+      rear_motor0();
+      while(1) DCpwmspeedstop1500();
       }
     }
-    front_motor0();         // 탈출 후 0도로 만들고 내가 관찰하는 value 값이 저 조건 만족안하면 계속 0도 유지
-    rear_motor0();
+    // front_motor0();         // 탈출 후 0도로 만들고 내가 관찰하는 value 값이 저 조건 만족안하면 계속 0도 유지
+    // rear_motor0();
   }
-  else(){
-    ;
-  }
+
   // else if (decision == 1){    // 2초 후 앞바퀴 완전히 돌리고 DC모터가 동작할 시간 2.5초 주고 다시 0도 만들기
   //   delay(2000);
   //   front_motor180();
