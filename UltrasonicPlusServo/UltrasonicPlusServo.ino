@@ -20,7 +20,7 @@
 
 #define Velocity_MeterperSecond   1
 
-#define Specific_Count    50
+#define Specific_Count    10
 
 void setup() {
   // 마프 1조 Auto Parking System 팀플 시작!
