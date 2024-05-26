@@ -3,7 +3,7 @@
 #define BT_TX 10
 #define BT_RX 11
 
-SoftwareSerial btSerial(BT_TX, BT_RX);
+SoftwareSerial bluetooth(BT_TX, BT_RX);
 
 uint8_t slave1 = 0x02; // 0b 00000010
 
@@ -19,14 +19,14 @@ void master_read_stop();
 
 void setup() {
   Serial.begin(9600);
-  btSerial.begin(38400);
+  bluetooth.begin(9600);
   delay(2000);
   master_setup();
 }
 
 void loop() {
-  if(btSerial.available()){
-    char received = btSerial.read();
+  if(bluetooth.available()) {
+    char received = bluetooth.read();
     uint8_t data = 99;
     if (received == '0') {
       data = 0;
@@ -36,7 +36,7 @@ void loop() {
       data = 2;
     }
 
-    if (received != '\n' & data != 99){
+    if ((received != '\n') && (data != 99) ){
       if (data == 0){
         master_read_start();
         master_read_address(slave1);

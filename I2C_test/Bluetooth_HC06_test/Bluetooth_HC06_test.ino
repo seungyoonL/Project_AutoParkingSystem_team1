@@ -3,21 +3,21 @@
 #define BT_TX 10
 #define BT_RX 11
 
-SoftwareSerial btSerial(BT_TX, BT_RX);
+SoftwareSerial bluetooth(BT_TX, BT_RX);
 
 void setup() {
   Serial.begin(9600);
-  btSerial.begin(38400);
+  bluetooth.begin(9600);
 }
 
 void loop() {
-  if(btSerial.available()){
-    char received = btSerial.read();
+  if(bluetooth.available()){
+    char received = bluetooth.read();
     Serial.write(received);
   }
 
   if(Serial.available()){
     char transmitted = Serial.read();
-    btSerial.write(transmitted);
+    bluetooth.write(transmitted);
   }
 }
