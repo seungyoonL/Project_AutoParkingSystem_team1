@@ -62,6 +62,8 @@ ISR(TWI_vect) {
       master_communication_start(); // 통신 시작
       break;
     case 0x28: // data 보내기 성공시
+      Serial.print("Transferred data: ");
+      Serial.println(data);
       master_write_stop(); // STOP 보내기
       break;
 
@@ -70,6 +72,8 @@ ISR(TWI_vect) {
       break;
     case 0x58: // TWDR에 Slave의 data값 입력 완료시
       *p_data = TWDR; // data에 TWDR값 입력
+      Serial.print("Received data: ");
+      Serial.println(data);
       master_read_stop(); // STOP 보내기
       break;
       
@@ -99,60 +103,64 @@ void loop() {
     
   if (bluetooth.available()) char dummy = bluetooth.read(); // '\n' 입력 안되게 버퍼에서 제거
   }
-
-  if (data == 1) {
+  bool decision = false;
+  static uint8_t count_left = 0;
+  static uint8_t count_right = 0;
+  if (data == 1){
     master_write_start();
+    while(!decision) {
 
-    static uint8_t count_left = 0;
-    static uint8_t count_right = 0;
+      uint16_t lengthmm_left;
+      uint16_t lengthmm_right;
 
-    uint16_t lengthmm_left;
-    uint16_t lengthmm_right;
+      uint16_t distance_front = distanceMm_front();
+      uint16_t distance_back = distanceMm_back();
+      uint16_t distance_left = distanceMm_left();
+      uint16_t distance_right = distanceMm_right();
 
-    uint16_t distance_front;
-    uint16_t distance_back;
-    uint16_t distance_left;
-    uint16_t distance_right;
+      count_left = countLength(distance_left, count_left);
+      count_right = countLength(distance_right, count_right);
 
-    distance_front = distanceMm_front();
-    distance_back = distanceMm_back();
-    distance_left = distanceMm_left();
-    distance_right = distanceMm_right();
+      lengthmm_left = count_left * Time_Interval * Velocity_MeterperSecond;
+      lengthmm_right = count_right * Time_Interval * Velocity_MeterperSecond;
 
-    count_left = countLength(distance_left, count_left);
-    count_right = countLength(distance_right, count_right);
+      showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, lengthmm_left, lengthmm_right);
 
-    lengthmm_left = count_left * Time_Interval * Velocity_MeterperSecond;
-    lengthmm_right = count_right * Time_Interval * Velocity_MeterperSecond;
+      delay(Time_Interval);
 
-    showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, lengthmm_left, lengthmm_right);
-
-    delay(Time_Interval);
-
-    bool decision = decideParking(lengthmm_left);
+      decision = decideParking(lengthmm_left);
+    }
 
     if (decision == 1) {
       data = 11;
       master_write_start();
+      delay(10);
 
-      uint16_t update_distance = distanceMm_left();
-      while (update_distance > 50) {
+      // uint16_t update_distance = distanceMm_left();
+      // Serial.print("update_distance: ");
+      // Serial.println(update_distance);
+      // uint8_t a = 1;
+
+      while (decision == 1) {
         uint16_t new_update_distance = distanceMm_left();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
         if (new_update_distance < 50) {
           count_left = 0;
+          decision = 0;
           data = 12;
           master_write_start();
+          delay(10);
           break;               
         }
       }
     }
   }
 
-  data = 99;
-  Serial.println(data);
+
+  Serial.print(".");
   delay(1000);
+  data = 99;
 }
 
 void master_setup() {

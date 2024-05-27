@@ -65,7 +65,6 @@ void setup() {
 
 void loop() {
   slave_communication_start(); // 통신 시작
-
   while (data == 1) { // 평행주차
     DCpwmspeed();
   }
@@ -75,24 +74,21 @@ void loop() {
     }
     front_motor180();
     rear_motor180();
-
     while(data == 11) {
-      for(uint8_t i = 0; i < 100; i++){
       DCpwmspeedback();
-      }
     }
 
     if (data == 12) {
       DCpwmspeedstop1500();
       front_motor0();
       rear_motor0();
+      data = 60;
     }
   }
 
 
   Serial.print(".");
   delay(1000);
-  data = 60;
 }
 
 void slave_setup() {
