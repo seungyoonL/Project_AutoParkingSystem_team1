@@ -21,44 +21,182 @@
 
 #define Specific_Count    5
 
-// 모터 기본 제어핀 2개
-#define frontDC1 0x04
-#define frontDC2 0x08
-// 모터 PWM 제어핀 1개
-#define frontDCpwm 0x80
-#define PPPWM 0x10
+// // 모터 기본 제어핀 2개
+// #define frontDC1 0x04
+// #define frontDC2 0x08
+// // 모터 PWM 제어핀 1개
+// #define frontDCpwm 0x80
+// #define PPPWM 0x10
+
+uint8_t frontDC1 = 0x04;
+uint8_t frontDC2 = 0x08;
+uint8_t frontDC1left = 0x10;
+uint8_t frontDC2left = 0x20;
+
+uint8_t rearDC1 = 0x02;
+uint8_t rearDC2 = 0x04;
+uint8_t rearDC1left = 0x10;
+uint8_t rearDC2left = 0x20;
+
+uint8_t frontDCpwm = 0x80;
+uint8_t frontDCleftpwm = 0x01;
+uint8_t rearDCpwm = 0x08;
+uint8_t rearDCleftpwm = 0x40;
 
 // volatile uint16_t value = 0;
 uint8_t AAA = 0;
 
-void DCpwmspeedfront() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
+// void DCpwmspeedfront() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
+//   PORTD |= frontDC1;
+//   PORTD &=~ frontDC2;
+//   for(uint8_t i = 0; i < 50; i++){
+//     PORTD |= (frontDCpwm | PPPWM);
+//     delayMicroseconds(19000);
+//     PORTD &=~ (frontDCpwm | PPPWM);
+//     delayMicroseconds(1000);
+//   }
+//   delay(5);
+// }
+// void DCpwmspeedback() {   //PWM 속도 적당히 조절 후 뒤로 돌리기
+//   PORTD |= frontDC2;
+//   PORTD &=~ frontDC1;
+//   for(uint8_t i = 0; i < 50; i++){
+//     PORTD |= (frontDCpwm | PPPWM);
+//     delayMicroseconds(19000);
+//     PORTD &=~ (frontDCpwm | PPPWM);
+//     delayMicroseconds(1000);
+//   }
+//   delay(5);
+// }
+// void DCpwmspeedstop1500() {   //PWM 속도 적당히 조절하여 가만히 있도록 하기
+//   PORTD &=~ frontDC2;
+//   PORTD &=~ frontDC1;
+//   delay(1500);
+// }
+
+void gogogogo() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
+  PORTB |= rearDC1;
+  PORTB &=~ rearDC2;
+  PORTB |= frontDC1left;
+  PORTB &=~ frontDC2left;
   PORTD |= frontDC1;
   PORTD &=~ frontDC2;
+  PORTD |=rearDC1left;
+  PORTD &=~ rearDC2left;
   for(uint8_t i = 0; i < 50; i++){
-    PORTD |= (frontDCpwm | PPPWM);
+    PORTB |= rearDCpwm;
+    PORTB |= frontDCleftpwm;
+    PORTD |= frontDCpwm;
+    PORTD |= rearDCleftpwm;
     delayMicroseconds(19000);
-    PORTD &=~ (frontDCpwm | PPPWM);
+    PORTB &=~ rearDCpwm;
+    PORTB &=~ frontDCleftpwm;
+    PORTD &=~ frontDCpwm;
+    PORTD &=~ rearDCleftpwm;
     delayMicroseconds(1000);
   }
   delay(5);
 }
-void DCpwmspeedback() {   //PWM 속도 적당히 조절 후 뒤로 돌리기
+
+void backbackbackback() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
+  PORTB |= rearDC2;
+  PORTB &=~ rearDC1;
+  PORTB |= frontDC2left;
+  PORTB &=~ frontDC1left;
   PORTD |= frontDC2;
   PORTD &=~ frontDC1;
+  PORTD |=rearDC2left;
+  PORTD &=~ rearDC1left;
   for(uint8_t i = 0; i < 50; i++){
-    PORTD |= (frontDCpwm | PPPWM);
+    PORTB |= rearDCpwm;
+    PORTB |= frontDCleftpwm;
+    PORTD |= frontDCpwm;
+    PORTD |= rearDCleftpwm;
     delayMicroseconds(19000);
-    PORTD &=~ (frontDCpwm | PPPWM);
+    PORTB &=~ rearDCpwm;
+    PORTB &=~ frontDCleftpwm;
+    PORTD &=~ frontDCpwm;
+    PORTD &=~ rearDCleftpwm;
     delayMicroseconds(1000);
   }
   delay(5);
 }
-void DCpwmspeedstop1500() {   //PWM 속도 적당히 조절하여 가만히 있도록 하기
-  PORTD &=~ frontDC2;
+
+void backgogoback() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
+  PORTB |= rearDC1;
+  PORTB &=~ rearDC2;
+  PORTB |= frontDC1left;
+  PORTB &=~ frontDC2left;
+  PORTD |= frontDC2;
   PORTD &=~ frontDC1;
+  PORTD |=rearDC2left;
+  PORTD &=~ rearDC1left;
+  for(uint8_t i = 0; i < 50; i++){
+    PORTB |= rearDCpwm;
+    PORTB |= frontDCleftpwm;
+    PORTD |= frontDCpwm;
+    PORTD |= rearDCleftpwm;
+    delayMicroseconds(19000);
+    PORTB &=~ rearDCpwm;
+    PORTB &=~ frontDCleftpwm;
+    PORTD &=~ frontDCpwm;
+    PORTD &=~ rearDCleftpwm;
+    delayMicroseconds(1000);
+  }
+  delay(5);
+}
+
+void gobackgoback() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
+  PORTB |= rearDC1;
+  PORTB &=~ rearDC2;
+  PORTB |= frontDC2left;
+  PORTB &=~ frontDC1left;
+  PORTD |= frontDC1;
+  PORTD &=~ frontDC2;
+  PORTD |= rearDC2left;
+  PORTD &=~ rearDC1left;
+  for(uint8_t i = 0; i < 50; i++){
+    PORTB |= rearDCpwm;
+    PORTB |= frontDCleftpwm;
+    PORTD |= frontDCpwm;
+    PORTD |= rearDCleftpwm;
+    delayMicroseconds(19000);
+    PORTB &=~ rearDCpwm;
+    PORTB &=~ frontDCleftpwm;
+    PORTD &=~ frontDCpwm;
+    PORTD &=~ rearDCleftpwm;
+    delayMicroseconds(1000);
+  }
+  delay(5);
+}
+
+void allstop() {   //PWM 속도 적당히 조절하여 가만히 있도록 하기
+  PORTB &=~ rearDC2;
+  PORTB &=~ rearDC1;
+  PORTB &=~ rearDC2left;
+  PORTB &=~ rearDC1left;  
+  PORTB &=~ frontDC1left;
+  PORTB &=~ frontDC2left;
+  PORTB &=~ frontDC1;
+  PORTB &=~ frontDC2;
   delay(1500);
 }
 
+void DCmotor_ready() {   //모터 기본 핀 설정 셋업
+  DDRD |= frontDC2;
+  DDRD |= frontDC1; 
+  DDRB |= frontDC1left;
+  DDRB |= frontDC2left;
+  DDRD |= frontDCpwm;
+  DDRB |= frontDCleftpwm;
+  DDRB |= rearDC1;
+  DDRB |= rearDC2;
+  DDRD |= rearDC1left;
+  DDRD |= rearDC2left;
+  DDRD |= rearDCpwm;
+  DDRB |= rearDCleftpwm;
+
+}
 
 //////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -70,8 +208,7 @@ void setup() {
   DDRB |= FRONT_SERVO; // 서보모터 PWM(주황색) 핀을 출력으로 연결시킴
   DDRB |= REAR_SERVO;
 
-  DDRD |= frontDC2;    // DC모터 앞쪽,오른쪽 제어 핀 출력으로 연결시킴
-  DDRD |= frontDC1; 
+  DCmotor_ready();
   
   Serial.begin(9600);
   // light_sensor_servo(); // 조도센서 기본설정 셋업
@@ -79,6 +216,8 @@ void setup() {
   front_motor0(); // 처음엔 조향각 0도
   rear_motor0();
   
+  allstop(); // DC모터 4개 모두 정지
+
   ultraSonic_setup();
 }
 
@@ -123,12 +262,12 @@ void loop() {
   // light_sensor_servo_loop(); //ADC 돌려서 값 보기
   // delay(500); // 텀은 0.5초 정도
 
-  DCpwmspeedback();
+  gogogogo();
   
   if (decision == 1){ 
     delay(500);
     for(uint8_t i = 0; i < 8; i++){
-      DCpwmspeedback();
+      backbackbackcback();
     };
     // delay(1000);               // 2초 있다가 앞바퀴 2개 완전히 돌리기
     front_motor180();
@@ -142,7 +281,7 @@ void loop() {
     Serial.println(update_distance);
     while(update_distance > 5){
       for(uint8_t i = 0; i < 10; i++){
-        DCpwmspeedback();
+        backgogoback();
               // uint16_t* new_update = detectCm_4direction();
       // update = detectCm_4direction();
         double new_update_distance = distanceCm_left();
@@ -155,10 +294,10 @@ void loop() {
         }
       }
       if(AAA == 1){
-        DCpwmspeedstop1500();
+        allstop();
         front_motor0();
         rear_motor0();
-        while(1) DCpwmspeedstop1500();
+        while(1) allstop();
       }
     }
     // front_motor0();         // 탈출 후 0도로 만들고 내가 관찰하는 value 값이 저 조건 만족안하면 계속 0도 유지

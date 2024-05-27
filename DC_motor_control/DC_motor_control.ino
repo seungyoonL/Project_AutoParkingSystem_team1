@@ -214,6 +214,13 @@ void setup() {   //모터 기본 핀 설정 셋업
   DDRB |= frontDC2left;
   DDRD |= frontDCpwm;
   DDRB |= frontDCleftpwm;
+  DDRB |= rearDC1;
+  DDRB |= rearDC2;
+  DDRD |= rearDC1left;
+  DDRD |= rearDC2left;
+  DDRD |= rearDCpwm;
+  DDRB |= rearDCleftpwm;
+
   // analogWrite(5, 255);
 }
 
