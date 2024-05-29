@@ -1,17 +1,20 @@
 #include <SoftwareSerial.h>
 
-#define BT_TX 12
-#define BT_RX 13
+#define BT_TX 12  // 12
+#define BT_RX 13  // 13
+
+#define FRONT_SERVO 0x04  // 2
+#define REAR_SERVO  0x08  // 3
 
 // 초음파 센서 Trig, Echo 핀 번호 설정
-#define pinTrig_front     0x40  // 6
-#define pinEcho_front     0x80  // 7
-#define pinTrig_back      0x10  // 4
-#define pinEcho_back      0x20  // 5
-#define pinTrig_left      0x04  // 10
-#define pinEcho_left      0x08  // 11
-#define pinTrig_right     0x01  // 8
-#define pinEcho_right     0x02  // 9
+#define pinTrig_front     0x10  // 4
+#define pinEcho_front     0x20  // 5
+#define pinTrig_back      0x40  // 6
+#define pinEcho_back      0x80  // 7
+#define pinTrig_left      0x01  // 8
+#define pinEcho_left      0x02  // 9
+#define pinTrig_right     0x04  // 10
+#define pinEcho_right     0x08  // 11
 
 // 차량 전장, 전폭 설정
 #define Car_Length        300
@@ -30,12 +33,25 @@ volatile uint8_t slave1 = 0x02; // 0b 00000010
 volatile uint8_t data = 99; // dummy data
 volatile uint8_t* p_data = &data;
 
+volatile bool decision = false;
+// volatile static uint8_t count_left = 0;
+// volatile static uint8_t count_right = 0;
+// volatile static uint8_t count = 0;
+
 void master_setup();
 void master_communication_start();
 void master_write_start();
 void master_write_stop();
 void master_read_start();
 void master_read_stop();
+
+void servo_setup();
+void servo_front_0();
+void servo_front_90();
+void servo_front_180();
+void servo_rear_0();
+void servo_rear_90();
+void servo_rear_180();
 
 void ultraSonic_setup();
 uint16_t distanceMm_front();
@@ -87,6 +103,7 @@ void setup() {
   Serial.begin(9600);
   bluetooth.begin(9600);
   master_setup();
+  servo_setup();
   ultraSonic_setup();
 }
 
@@ -103,15 +120,17 @@ void loop() {
     
   if (bluetooth.available()) char dummy = bluetooth.read(); // '\n' 입력 안되게 버퍼에서 제거
   }
-  bool decision = false;
+
   static uint8_t count_left = 0;
   static uint8_t count_right = 0;
-  if (data == 1){
-    master_write_start();
-    while(!decision) {
+  static uint8_t count = 0;
 
-      uint16_t lengthmm_left;
-      uint16_t lengthmm_right;
+  if (data == 1){ // 평행주차
+    master_write_start();
+    delay(10);
+    
+
+    while(!decision) { // 주차공간 찾기
 
       uint16_t distance_front = distanceMm_front();
       uint16_t distance_back = distanceMm_back();
@@ -121,8 +140,8 @@ void loop() {
       count_left = countLength(distance_left, count_left);
       count_right = countLength(distance_right, count_right);
 
-      lengthmm_left = count_left * Time_Interval * Velocity_MeterperSecond;
-      lengthmm_right = count_right * Time_Interval * Velocity_MeterperSecond;
+      uint16_t lengthmm_left = count_left * Time_Interval * Velocity_MeterperSecond;
+      uint16_t lengthmm_right = count_right * Time_Interval * Velocity_MeterperSecond;
 
       showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, lengthmm_left, lengthmm_right);
 
@@ -131,27 +150,39 @@ void loop() {
       decision = decideParking(lengthmm_left);
     }
 
-    if (decision == 1) {
+    if (decision == 1) { // 주차공간 찾으면
+      count_left = 0;
+
       data = 11;
       master_write_start();
-      delay(10);
+      
+      delay(2500); // DC 멈출 때까지 기다림
 
-      // uint16_t update_distance = distanceMm_left();
-      // Serial.print("update_distance: ");
-      // Serial.println(update_distance);
-      // uint8_t a = 1;
+      servo_front_180(); // 바퀴 회전
+      servo_rear_180(); // 바퀴 회전
 
-      while (decision == 1) {
+      while (decision == 1) { // 가까워질 때까지
         uint16_t new_update_distance = distanceMm_left();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
-        if (new_update_distance < 50) {
-          count_left = 0;
+
+        if (new_update_distance <= 50) {
+          count += 1;
+        } else if (new_update_distance > 50) {
+          count = 0;
+        }
+
+        if (count >= 10) {
           decision = 0;
+
           data = 12;
           master_write_start();
-          delay(10);
-          break;               
+          delay(1000); // DC 멈출 때까지 기다림
+
+          servo_front_0();
+          servo_rear_0();
+
+          data = 99; // data 값 초기화
         }
       }
     }
@@ -160,7 +191,6 @@ void loop() {
 
   Serial.print(".");
   delay(1000);
-  data = 99;
 }
 
 void master_setup() {
@@ -193,6 +223,68 @@ void master_read_stop() {
   while (TWCR & (1 << TWSTO)); // TWSTO가 다시 0 될때까지 기다림
 }
 
+void servo_setup() {
+  DDRD |= FRONT_SERVO; // 서보모터 PWM(주황색) 핀을 출력으로 연결시킴
+  DDRD |= REAR_SERVO;
+
+  servo_front_0();
+  servo_rear_0();
+}
+
+void servo_front_0() { // 서보모터 0도                     
+   for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= FRONT_SERVO;
+    delayMicroseconds(500);
+    PORTD &=~ FRONT_SERVO;
+    delayMicroseconds(19500);
+  }
+}
+
+void servo_front_90() { // 서보모터 90도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= FRONT_SERVO;
+    delayMicroseconds(1500);
+    PORTD &=~ FRONT_SERVO;
+    delayMicroseconds(18500);
+  }
+}
+
+void servo_front_180() { // 서보모터 180도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= FRONT_SERVO;
+    delayMicroseconds(2500);
+    PORTD &=~ FRONT_SERVO;
+    delayMicroseconds(17500);
+  }
+}
+
+void servo_rear_0() { // 서보모터 0도                     
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= REAR_SERVO;
+    delayMicroseconds(500);
+    PORTD &=~ REAR_SERVO;
+    delayMicroseconds(19500);
+  }
+}
+
+void servo_rear_90() { // 서보모터 90도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= REAR_SERVO;
+    delayMicroseconds(1500);
+    PORTD &=~ REAR_SERVO;
+    delayMicroseconds(18500);
+  }
+}
+
+void servo_rear_180() { // 서보모터 180도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= REAR_SERVO;
+    delayMicroseconds(2500);
+    PORTD &=~ REAR_SERVO;
+    delayMicroseconds(17500);
+  }
+}
+
 // 초음파 센서 핀 초기 설정
 void ultraSonic_setup() {
   DDRD |= pinTrig_front;
@@ -216,7 +308,7 @@ uint16_t distanceMm_front() {
 
   PORTD &= ~pinTrig_front;
 
-  uint16_t duration = pulseIn(2, HIGH, 100000);
+  uint16_t duration = pulseIn(5, HIGH, 100000);
 
   uint16_t mm = (duration/2) * 0.343;
   return mm;
@@ -232,7 +324,7 @@ uint16_t distanceMm_back() {
 
   PORTD &= ~pinTrig_back;
 
-  uint16_t duration = pulseIn(5, HIGH, 100000);
+  uint16_t duration = pulseIn(7, HIGH, 100000);
 
   uint16_t mm = (duration/2) * 0.343;
   return mm;
@@ -248,7 +340,7 @@ uint16_t distanceMm_left() {
 
   PORTB &= ~pinTrig_left;
 
-  uint16_t duration = pulseIn(11, HIGH, 100000);
+  uint16_t duration = pulseIn(9, HIGH, 100000);
 
   uint16_t mm = (duration/2) * 0.343;
   return mm;
@@ -264,7 +356,7 @@ uint16_t distanceMm_right() {
 
   PORTB &= ~pinTrig_right;
 
-  uint16_t duration = pulseIn(13, HIGH, 100000);
+  uint16_t duration = pulseIn(11, HIGH, 100000);
 
   uint16_t mm = (duration/2) * 0.343;
   return mm;
