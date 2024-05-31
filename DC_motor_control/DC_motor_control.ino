@@ -20,25 +20,25 @@ int rearDCleftpwm = 0x40;
 
 
 void gogogogo() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
-  PORTB |= rearDC1;
-  PORTB &=~ rearDC2;
-  PORTB |= frontDC1left;
-  PORTB &=~ frontDC2left;
-  PORTD |= frontDC1;
-  PORTD &=~ frontDC2;
-  PORTD |=rearDC1left;
-  PORTD &=~ rearDC2left;
+  PORTB |= (rearDC1 | frontDC1left);
+  PORTB &=~ (rearDC2 | frontDC2left);
+  // PORTB |= frontDC1left;
+  // PORTB &=~ frontDC2left;
+  PORTD |= (frontDC1 | rearDC1left);
+  PORTD &=~ (frontDC2 | rearDC2left);
+  // PORTD |=rearDC1left;
+  // PORTD &=~ rearDC2left;
   for(uint8_t i = 0; i < 50; i++){
-    PORTB |= rearDCpwm;
-    PORTB |= frontDCleftpwm;
-    PORTD |= frontDCpwm;
-    PORTD |= rearDCleftpwm;
-    delayMicroseconds(19000);
-    PORTB &=~ rearDCpwm;
-    PORTB &=~ frontDCleftpwm;
-    PORTD &=~ frontDCpwm;
-    PORTD &=~ rearDCleftpwm;
-    delayMicroseconds(1000);
+    PORTB |= (rearDCpwm | frontDCleftpwm);
+    // PORTB |= frontDCleftpwm;
+    PORTD |= (frontDCpwm | rearDCleftpwm);
+    // PORTD |= rearDCleftpwm;
+    delayMicroseconds(19999);
+    PORTB &=~ (rearDCpwm | frontDCleftpwm);
+    // PORTB &=~ frontDCleftpwm;
+    PORTD &=~ (frontDCpwm | rearDCleftpwm);
+    // PORTD &=~ rearDCleftpwm;
+    delayMicroseconds(1);
   }
   delay(5);
 }
@@ -57,12 +57,12 @@ void backbackbackback() {     // PWM 속도 적당히 조절 후 앞으로 돌�
     PORTB |= frontDCleftpwm;
     PORTD |= frontDCpwm;
     PORTD |= rearDCleftpwm;
-    delayMicroseconds(19000);
+    delayMicroseconds(19999);
     PORTB &=~ rearDCpwm;
     PORTB &=~ frontDCleftpwm;
     PORTD &=~ frontDCpwm;
     PORTD &=~ rearDCleftpwm;
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
   }
   delay(5);
 }
@@ -81,12 +81,12 @@ void backgogoback() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
     PORTB |= frontDCleftpwm;
     PORTD |= frontDCpwm;
     PORTD |= rearDCleftpwm;
-    delayMicroseconds(19000);
+    delayMicroseconds(19999);
     PORTB &=~ rearDCpwm;
     PORTB &=~ frontDCleftpwm;
     PORTD &=~ frontDCpwm;
     PORTD &=~ rearDCleftpwm;
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
   }
   delay(5);
 }
@@ -105,12 +105,12 @@ void gobackgoback() {     // PWM 속도 적당히 조절 후 앞으로 돌리기
     PORTB |= frontDCleftpwm;
     PORTD |= frontDCpwm;
     PORTD |= rearDCleftpwm;
-    delayMicroseconds(19000);
+    delayMicroseconds(19999);
     PORTB &=~ rearDCpwm;
     PORTB &=~ frontDCleftpwm;
     PORTD &=~ frontDCpwm;
     PORTD &=~ rearDCleftpwm;
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
   }
   delay(5);
 }
@@ -225,23 +225,23 @@ void setup() {   //모터 기본 핀 설정 셋업
 }
 
 void loop() {           
-  for(uint8_t i = 0; i <8 ; i++){
+  for(uint8_t i = 0; i <20 ; i++){
     gogogogo();
   } 
-  delay(1000);
-  for(uint8_t i = 0; i < 8; i++){
+  delay(2000);
+  for(uint8_t i = 0; i < 20; i++){
     backbackbackback();
   }
-  delay(1000);    // DC모터가 평상시엔 그냥 앞으로 돌고 있음
-  for(uint8_t i = 0; i <8 ; i++){
-    backgogoback();
-  } 
-  delay(1000);
-  for(uint8_t i = 0; i < 8; i++){
-    gobackgoback();
-  }
-  delay(1000);
-  for(uint8_t i = 0; i < 2; i++){
+  delay(2000);                                                   // DC모터가 평상시엔 그냥 앞으로 돌고 있음
+  // for(uint8_t i = 0; i <10 ; i++){
+  //   backgogoback();
+  // } 
+  // delay(500);
+  // for(uint8_t i = 0; i < 10; i++){
+  //   gobackgoback();
+  // }
+  // delay(500);
+  for(uint8_t i = 0; i < 1; i++){
     allstop();
   }
   delay(1000);
