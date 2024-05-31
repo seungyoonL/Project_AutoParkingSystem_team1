@@ -13,6 +13,9 @@
 #define pinTrig_right     0x04  // 10
 #define pinEcho_right     0x08  // 11
 
+// 적외선 센서 출력 핀
+#define ir_right          0x04  // 2
+
 // 차량 전장, 전폭 설정
 #define Car_Length        300
 #define Car_Width         80
@@ -54,6 +57,10 @@ void showDistance(uint16_t d_1, uint16_t d_2, uint16_t d_3, uint16_t d_4, uint8_
 uint8_t countLength(uint8_t width, uint8_t cnt);
 bool decideParking(uint16_t length);
 
+void ADC_setup();
+void infraredray_setup();
+void external_setup();
+
 ISR(TWI_vect) {
   switch (TWSR & 0xF8) {
     case 0x08: // START 보내기 성공시
@@ -91,11 +98,24 @@ ISR(TWI_vect) {
   }
 }
 
+ISR(INT0_vect) {
+  decision = 0;
+
+  data = 12;
+  master_write_start();
+  delay(1000); // DC 멈출 때까지 기다림
+
+  data = 99; // data 값 초기화
+}
+
 void setup() {
   Serial.begin(9600);
   bluetooth.begin(9600);
   master_setup();
   ultraSonic_setup();
+  ADC_setup();
+  infraredray_setup();
+  external_setup();
 }
 
 void loop() {
@@ -139,6 +159,8 @@ void loop() {
     }
 
     if (decision == 1) { // 주차공간 찾으면
+      uint16_t ir_value;
+
       count_left = 0;
 
       data = 11;
@@ -146,10 +168,20 @@ void loop() {
       
       delay(2500); // DC 멈출 때까지 기다림
 
-      // servo_front_180(); // 바퀴 회전
-      // servo_rear_180(); // 바퀴 회전
+      ADCSRA |= (1 << ADSC);    // 정차 후 ADC 시작
 
       while (decision == 1) { // 가까워질 때까지
+
+        ir_value = ADC;
+        Serial.print("ir_value: ");
+        Serial.println(ir_value);
+
+        if (ir_value < 200) {
+          PORTD &= ~ir_right;
+        } else if (ir_value > 200) {
+          PORTD |= ir_right;
+        }
+
         uint16_t new_update_distance = distanceMm_left();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
@@ -166,9 +198,6 @@ void loop() {
           data = 12;
           master_write_start();
           delay(1000); // DC 멈출 때까지 기다림
-
-          // servo_front_0();
-          // servo_rear_0();
 
           data = 99; // data 값 초기화
         }
@@ -339,3 +368,47 @@ bool decideParking(uint16_t length) {
     return 0;
   }
 }
+
+void ADC_setup() {
+  ADMUX &= ~ (1 << REFS1);
+  ADMUX |= (1 << REFS0);
+  ADMUX &= ~ (1 << ADLAR);
+  ADMUX &= ~ ((1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0));
+
+  ADCSRA |= (1 << ADEN);
+  ADCSRA |= (1 << ADATE);
+  // ADC Interrupt Enable
+  // ADCSRA |= (1 << ADIE);
+  ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+
+  ADCSRB &= ~ ((1 << ADTS2) | (1 << ADTS1) | (1 << ADTS0));
+}
+
+void infraredray_setup() {
+  DDRD |= ir_right;
+}
+
+void external_setup() {
+  SREG |= (1 << SREG_I);
+
+  EICRA |= (1 << ISC01);
+  EICRA &= ~(1 << ISC00);
+  EIMSK |= (1 << INT0);
+}
+
+// void setup() {
+//   Serial.begin(9600);
+
+//   init_ADC();
+
+//   ADCSRA |= (1 << ADSC);
+// }
+
+// void loop() {
+//   ADCSRA |= (1 << ADSC);
+
+//   uint16_t value = ADC;
+//   Serial.println(value);
+
+//   delay(100);
+// }
