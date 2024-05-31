@@ -14,8 +14,8 @@
 #define pinEcho_right     0x08  // 11
 
 // 차량 전장, 전폭 설정
-#define Car_Length        300
-#define Car_Width         80
+#define Car_Length        180
+#define Car_Width         140
 
 // 측정 주기, 차량 속도
 #define Time_Interval     20
@@ -34,9 +34,16 @@ volatile uint8_t data = 99; // dummy data
 volatile uint8_t* p_data = &data;
 
 volatile bool decision = false;
-volatile static uint8_t count_left = 0;
-volatile static uint8_t count_right = 0;
-volatile static uint8_t count = 0;
+volatile bool decision_left = false;
+volatile bool decision_right = false;
+
+volatile uint8_t direction = 0;
+
+volatile uint8_t count_left = 0;
+volatile uint8_t count_right = 0;
+volatile uint8_t count_front = 0;
+volatile uint8_t count_back = 0;
+volatile uint8_t count = 0;
 
 void master_setup();
 void master_communication_start();
@@ -51,8 +58,11 @@ uint16_t distanceMm_back();
 uint16_t distanceMm_left();
 uint16_t distanceMm_right();
 void showDistance(uint16_t d_1, uint16_t d_2, uint16_t d_3, uint16_t d_4, uint8_t c_left, uint8_t c_right, uint16_t l_left, uint16_t l_right);
-uint8_t countLength(uint8_t width, uint8_t cnt);
-bool decideParking(uint16_t length);
+uint8_t countLength_P(uint8_t width, uint8_t cnt);
+uint8_t countWidth_T(uint8_t length, uint8_t cnt);
+
+bool decideParking_P(uint16_t length);
+bool decideParking_T(uint16_t width);
 
 ISR(TWI_vect) {
   switch (TWSR & 0xF8) {
@@ -112,7 +122,7 @@ void loop() {
   if (bluetooth.available()) char dummy = bluetooth.read(); // '\n' 입력 안되게 버퍼에서 제거
   } // 블루투스 값 받기 끝
 
-  if (data == 1){ // 평행주차(왼쪽)
+  if (data == 1) { // 평행주차(왼쪽)
     chosen_slave = general_call; // Slave 모두에게 보내기
     master_write_start();
     delay(10);
@@ -125,8 +135,8 @@ void loop() {
       uint16_t distance_left = distanceMm_left();
       uint16_t distance_right = distanceMm_right();
 
-      count_left = countLength(distance_left, count_left);
-      count_right = countLength(distance_right, count_right);
+      count_left = countLength_P(distance_left, count_left);
+      count_right = countLength_P(distance_right, count_right);
 
       uint16_t lengthmm_left = count_left * Time_Interval * Velocity_MeterperSecond;
       uint16_t lengthmm_right = count_right * Time_Interval * Velocity_MeterperSecond;
@@ -135,21 +145,28 @@ void loop() {
 
       delay(Time_Interval);
 
-      decision = decideParking(lengthmm_left);
+      decision_left = decideParking_P(lengthmm_left);
+      decision_right = decideParking_P(lengthmm_right);
+
+      if (decision_right == true) {
+        decision = true;
+        direction = 2; // 주차 오른쪽
+      } else if (decision_left == true) {
+        decision = true;
+        direction = 1; // 주차 왼쪽
+      }
     }
 
-    if (decision == 1) { // 주차공간 찾으면
+    if (direction == 1) { // 왼쪽 주차공간 찾으면
       count_left = 0;
+      count_right = 0;
 
-      data = 11;
+      data = 10;
       master_write_start();
       
       delay(2500); // DC 멈출 때까지 기다림
 
-      // servo_front_180(); // 바퀴 회전
-      // servo_rear_180(); // 바퀴 회전
-
-      while (decision == 1) { // 가까워질 때까지
+      while (decision == true) { // 가까워질 때까지
         uint16_t new_update_distance = distanceMm_left();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
@@ -161,23 +178,146 @@ void loop() {
         }
 
         if (count >= 10) {
-          decision = 0;
-
-          data = 12;
+          data = 11;
           master_write_start();
           delay(1000); // DC 멈출 때까지 기다림
+          
+          decision = false;
+          direction = 0;
+          data = 99; // data 값 초기화
+        }
+      }
+    } else if (direction == 2) { // 오른쪽 주차공간 찾으면
+      count_left = 0;
+      count_right = 0;
 
-          // servo_front_0();
-          // servo_rear_0();
+      data = 15;
+      master_write_start();
 
+      delay(2500);
+
+      while (decision == true) { // 가까워질 때까지
+        uint16_t new_update_distance = distanceMm_right();
+        Serial.print("new_update_distance: ");
+        Serial.println(new_update_distance);
+
+        if (new_update_distance <= 50) {
+          count += 1;
+        } else if (new_update_distance > 50) {
+          count = 0;
+        }
+
+        if (count >= 10) {
+          data = 16;
+          master_write_start();
+          delay(1000); // DC 멈출 때까지 기다림
+          
+          decision = false;
+          direction = 0;
+          data = 99; // data 값 초기화
+        }
+      }
+    }
+  } else if (data == 2) { // T자 주차
+    chosen_slave = general_call; // Slave 모두에게 보내기
+    master_write_start();
+    delay(10);
+    
+
+    while(!decision) { // 주차공간 찾기
+
+      uint16_t distance_front = distanceMm_front();
+      uint16_t distance_back = distanceMm_back();
+      uint16_t distance_left = distanceMm_left();
+      uint16_t distance_right = distanceMm_right();
+
+      count_left = countWidth_T(distance_left, count_left);
+      count_right = countWidth_T(distance_right, count_right);
+
+      uint16_t lengthmm_left = count_left * Time_Interval * Velocity_MeterperSecond;
+      uint16_t lengthmm_right = count_right * Time_Interval * Velocity_MeterperSecond;
+
+      showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, lengthmm_left, lengthmm_right);
+
+      delay(Time_Interval);
+
+      decision_left = decideParking_T(lengthmm_left);
+      decision_right = decideParking_T(lengthmm_right);
+
+      if (decision_right == true) {
+        decision = true;
+        direction = 2; // T자 주차 오른쪽
+      } else if (decision_left == true) {
+        decision = true;
+        direction = 1; // T자 주차 왼쪽
+      }
+    }
+
+    if (direction == 1) { // T자 왼쪽 주차공간 찾으면
+      count_left = 0;
+      count_right = 0;
+
+      data = 20;
+      master_write_start();
+      
+      delay(4500); // DC 멈출 때까지 기다림
+
+      while (decision == true) { // 가까워질 때까지
+        uint16_t new_update_distance = distanceMm_back();
+        Serial.print("new_update_distance: ");
+        Serial.println(new_update_distance);
+
+        if (new_update_distance <= 50) {
+          count += 1;
+        } else if (new_update_distance > 50) {
+          count = 0;
+        }
+
+        if (count >= 10) {
+          data = 21;
+          master_write_start();
+          delay(1000); // DC 멈출 때까지 기다림
+          
+          decision = false;
+          direction = 0;
+          data = 99; // data 값 초기화
+        }
+      }
+    } else if (direction == 2) {
+      count_left = 0;
+      count_right = 0;
+
+      data = 25;
+      master_write_start();
+      
+      delay(2500); // DC 멈출 때까지 기다림
+
+      while (decision == true) { // 가까워질 때까지
+        uint16_t new_update_distance = distanceMm_back();
+        Serial.print("new_update_distance: ");
+        Serial.println(new_update_distance);
+
+        if (new_update_distance <= 50) {
+          count += 1;
+        } else if (new_update_distance > 50) {
+          count = 0;
+        }
+
+        if (count >= 10) {
+          data = 26;
+          master_write_start();
+          delay(1000); // DC 멈출 때까지 기다림
+          
+          decision = false;
+          direction = 0;
           data = 99; // data 값 초기화
         }
       }
     }
   }
 
-
   Serial.print(".");
+
   delay(1000);
 }
 
@@ -321,7 +461,7 @@ void showDistance(uint16_t d_1, uint16_t d_2, uint16_t d_3, uint16_t d_4, uint8_
 }
 
 // 횟수 카운트
-uint8_t countLength(uint8_t width, uint8_t cnt) {
+uint8_t countLength_P(uint8_t width, uint8_t cnt) {
   if(width > Car_Width + 30) {
     cnt += 1;
   }
@@ -331,8 +471,27 @@ uint8_t countLength(uint8_t width, uint8_t cnt) {
   return cnt;
 }
 
-bool decideParking(uint16_t length) {
+uint8_t countWidth_T(uint8_t length, uint8_t cnt) {
+  if(length > Car_Length + 10) {
+    cnt += 1;
+  }
+  else if(length < Car_Length + 10) {
+    cnt = 0;
+  }
+  return cnt;
+}
+
+bool decideParking_P(uint16_t length) {
   if(length >= Specific_Count * Time_Interval * Velocity_MeterperSecond) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+bool decideParking_T(uint16_t width) {
+  if(width >= Specific_Count * Time_Interval * Velocity_MeterperSecond) {
     return 1;
   }
   else {

@@ -73,7 +73,7 @@ void loop() {
   if (data == 1) { // 평행주차(왼쪽)
     while (data == 1);
 
-    if (data == 11) {
+    if (data == 10) {
       delay(2500);
 
       servo_front_left_180();
@@ -81,9 +81,87 @@ void loop() {
       servo_rear_left_180();
       servo_rear_right_180();
 
-      while(data == 11);
+      while(data == 10);
 
-      if (data == 12) {
+      if (data == 11) {
+        delay(1000);
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
+
+        data = 60;
+      }
+    } else if (data == 15) {
+      delay(2500);
+
+      servo_front_left_180();
+      servo_front_right_180();
+      servo_rear_left_180();
+      servo_rear_right_180();
+
+      while(data == 15);
+
+      if (data == 16) {
+        delay(1000);
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
+
+        data = 60;
+      }
+    }
+  } else if (data == 2) {
+    while (data == 2);
+
+    if (data == 20) {
+      delay(2500);
+
+      servo_front_left_180();
+      servo_front_right_180();
+      servo_rear_left_180();
+      servo_rear_right_180();
+
+      delay(2500);
+      // 90도 회전
+      servo_front_left_180();
+      servo_front_right_180();
+      servo_rear_left_180();
+      servo_rear_right_180();
+
+      while(data == 20);
+
+      if (data == 21) {
+        delay(1000);
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
+
+        data = 60;
+      }
+    } else if (data == 25) {
+      delay(2500);
+
+      servo_front_left_180();
+      servo_front_right_180();
+      servo_rear_left_180();
+      servo_rear_right_180();
+
+      delay(2500);
+      // 90도 회전
+      servo_front_left_180();
+      servo_front_right_180();
+      servo_rear_left_180();
+      servo_rear_right_180();
+
+      while(data == 25);
+
+      if (data == 26) {
         delay(1000);
 
         servo_front_left_0();
