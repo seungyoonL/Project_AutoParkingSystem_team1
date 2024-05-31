@@ -264,6 +264,7 @@ uint8_t countLength(uint8_t width, uint8_t cnt) {
   return cnt;
 }
 
+// 공간이 차보다 넓으면 1 반환
 bool decideParking(uint16_t length) {
   if(length >= Specific_Count * Time_Interval * Velocity_MeterperSecond) {
     return 1;
