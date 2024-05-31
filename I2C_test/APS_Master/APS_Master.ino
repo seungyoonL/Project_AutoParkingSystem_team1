@@ -3,6 +3,9 @@
 #define BT_TX 12  // 12
 #define BT_RX 13  // 13
 
+#define FRONT_SERVO 0x04  // 2
+#define REAR_SERVO  0x08  // 3
+
 // 초음파 센서 Trig, Echo 핀 번호 설정
 #define pinTrig_front     0x10  // 4
 #define pinEcho_front     0x20  // 5
@@ -26,17 +29,14 @@
 
 SoftwareSerial bluetooth(BT_TX, BT_RX);
 
-volatile uint8_t chosen_slave = 0x00;
-volatile uint8_t general_call = 0x00;
 volatile uint8_t slave1 = 0x02; // 0b 00000010
-volatile uint8_t slave2 = 0x04; // 0b 00000100
 volatile uint8_t data = 99; // dummy data
 volatile uint8_t* p_data = &data;
 
 volatile bool decision = false;
-volatile static uint8_t count_left = 0;
-volatile static uint8_t count_right = 0;
-volatile static uint8_t count = 0;
+// volatile static uint8_t count_left = 0;
+// volatile static uint8_t count_right = 0;
+// volatile static uint8_t count = 0;
 
 void master_setup();
 void master_communication_start();
@@ -44,6 +44,14 @@ void master_write_start();
 void master_write_stop();
 void master_read_start();
 void master_read_stop();
+
+void servo_setup();
+void servo_front_0();
+void servo_front_90();
+void servo_front_180();
+void servo_rear_0();
+void servo_rear_90();
+void servo_rear_180();
 
 void ultraSonic_setup();
 uint16_t distanceMm_front();
@@ -58,9 +66,9 @@ ISR(TWI_vect) {
   switch (TWSR & 0xF8) {
     case 0x08: // START 보내기 성공시
       if (data == 0) { // Master read모드
-        TWDR = chosen_slave + 1; // TWDR에 slave_address 및 read모드(1) 입력
+        TWDR = slave1 + 1; // TWDR에 slave_address 및 read모드(1) 입력
       } else { // Master write모드
-        TWDR = chosen_slave + 0; // TWDR에 slave_address 및 write모드(0) 입력
+        TWDR = slave1 + 0; // TWDR에 slave_address 및 write모드(0) 입력
       }
       TWCR &= ~(1 << TWSTA); // START 비트 0으로 만들어줌
       master_communication_start(); // 통신 시작
@@ -95,11 +103,12 @@ void setup() {
   Serial.begin(9600);
   bluetooth.begin(9600);
   master_setup();
+  servo_setup();
   ultraSonic_setup();
 }
 
 void loop() {
-  while(bluetooth.available()) { // 블루투스 값 받기
+  while(bluetooth.available()) {
     char received = bluetooth.read();
     if (received == '0') { // 0이면 읽기, 1 또는 2면 쓰기
       data = 0;
@@ -110,10 +119,13 @@ void loop() {
     }
     
   if (bluetooth.available()) char dummy = bluetooth.read(); // '\n' 입력 안되게 버퍼에서 제거
-  } // 블루투스 값 받기 끝
+  }
 
-  if (data == 1){ // 평행주차(왼쪽)
-    chosen_slave = general_call; // Slave 모두에게 보내기
+  static uint8_t count_left = 0;
+  static uint8_t count_right = 0;
+  static uint8_t count = 0;
+
+  if (data == 1){ // 평행주차
     master_write_start();
     delay(10);
     
@@ -146,8 +158,8 @@ void loop() {
       
       delay(2500); // DC 멈출 때까지 기다림
 
-      // servo_front_180(); // 바퀴 회전
-      // servo_rear_180(); // 바퀴 회전
+      servo_front_180(); // 바퀴 회전
+      servo_rear_180(); // 바퀴 회전
 
       while (decision == 1) { // 가까워질 때까지
         uint16_t new_update_distance = distanceMm_left();
@@ -167,8 +179,8 @@ void loop() {
           master_write_start();
           delay(1000); // DC 멈출 때까지 기다림
 
-          // servo_front_0();
-          // servo_rear_0();
+          servo_front_0();
+          servo_rear_0();
 
           data = 99; // data 값 초기화
         }
@@ -209,6 +221,68 @@ void master_read_start() {
 void master_read_stop() {
   TWCR |= (1 << TWINT) | (1 << TWSTO); // STOP 보내기 및 통신 시작
   while (TWCR & (1 << TWSTO)); // TWSTO가 다시 0 될때까지 기다림
+}
+
+void servo_setup() {
+  DDRD |= FRONT_SERVO; // 서보모터 PWM(주황색) 핀을 출력으로 연결시킴
+  DDRD |= REAR_SERVO;
+
+  servo_front_0();
+  servo_rear_0();
+}
+
+void servo_front_0() { // 서보모터 0도                     
+   for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= FRONT_SERVO;
+    delayMicroseconds(500);
+    PORTD &=~ FRONT_SERVO;
+    delayMicroseconds(19500);
+  }
+}
+
+void servo_front_90() { // 서보모터 90도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= FRONT_SERVO;
+    delayMicroseconds(1500);
+    PORTD &=~ FRONT_SERVO;
+    delayMicroseconds(18500);
+  }
+}
+
+void servo_front_180() { // 서보모터 180도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= FRONT_SERVO;
+    delayMicroseconds(2500);
+    PORTD &=~ FRONT_SERVO;
+    delayMicroseconds(17500);
+  }
+}
+
+void servo_rear_0() { // 서보모터 0도                     
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= REAR_SERVO;
+    delayMicroseconds(500);
+    PORTD &=~ REAR_SERVO;
+    delayMicroseconds(19500);
+  }
+}
+
+void servo_rear_90() { // 서보모터 90도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= REAR_SERVO;
+    delayMicroseconds(1500);
+    PORTD &=~ REAR_SERVO;
+    delayMicroseconds(18500);
+  }
+}
+
+void servo_rear_180() { // 서보모터 180도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= REAR_SERVO;
+    delayMicroseconds(2500);
+    PORTD &=~ REAR_SERVO;
+    delayMicroseconds(17500);
+  }
 }
 
 // 초음파 센서 핀 초기 설정
