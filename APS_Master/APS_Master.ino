@@ -22,7 +22,7 @@
 
 #define Velocity_MeterperSecond   1
 
-#define Specific_Count    10
+#define Specific_Count    9
 
 SoftwareSerial bluetooth(BT_TX, BT_RX);
 
@@ -58,8 +58,8 @@ uint16_t distanceMm_back();
 uint16_t distanceMm_left();
 uint16_t distanceMm_right();
 void showDistance(uint16_t d_1, uint16_t d_2, uint16_t d_3, uint16_t d_4, uint8_t c_left, uint8_t c_right, uint16_t l_left, uint16_t l_right);
-uint8_t countLength_P(uint8_t width, uint8_t cnt);
-uint8_t countWidth_T(uint8_t length, uint8_t cnt);
+uint8_t countLength_P(uint16_t width, uint16_t cnt);
+uint8_t countWidth_T(uint16_t length, uint16_t cnt);
 
 bool decideParking_P(uint16_t length);
 bool decideParking_T(uint16_t width);
@@ -143,6 +143,36 @@ void loop() {
 
       showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, lengthmm_left, lengthmm_right);
 
+      // if (bluetooth.available()) {
+      //   char received = bluetooth.read();
+      //   char dummy = bluetooth.read();
+      //   if (received == '0') {
+      //     data = 0;
+      //     chosen_slave = general_call;  // Slave 모두에게 보내기
+      //     master_write_start();
+      //     delay(10);
+
+      //     decision = true;
+      //   }
+      // }
+
+      //////////////////////////////////////////////////////////////////////
+      // if (data == 0) {  // 긴급정지
+      //   chosen_slave = general_call;  // Slave 모두에게 보내기
+      //   master_write_start();
+      //   delay(10);
+      // }
+      //////////////////////////////////////////////////////////////////////
+
+      if (distance_front <= 150) {
+        data = 50;
+        master_write_start();
+
+        delay(10);
+
+        decision = true;
+      }
+
       delay(Time_Interval);
 
       decision_left = decideParking_P(lengthmm_left);
@@ -161,23 +191,50 @@ void loop() {
       count_left = 0;
       count_right = 0;
 
+      // if (bluetooth.available()) {
+      //   char received = bluetooth.read();
+      //   char dummy = bluetooth.read();
+      //   if (received == '0') {
+      //     data = 0;
+      //     chosen_slave = general_call;  // Slave 모두에게 보내기
+      //     master_write_start();
+      //     delay(10);
+
+      //     decision = true;
+      //   }
+      // }
+
       data = 10;
       master_write_start();
       
       delay(2500); // DC 멈출 때까지 기다림
 
       while (decision == true) { // 왼쪽 물체에 가까워질 때까지
+
+      //   if (bluetooth.available()) {
+      //   char received = bluetooth.read();
+      //   char dummy = bluetooth.read();
+      //   if (received == '0') {
+      //     data = 0;
+      //     chosen_slave = general_call;  // Slave 모두에게 보내기
+      //     master_write_start();
+      //     delay(10);
+
+      //     decision = true;
+      //   }
+      // }
+
         uint16_t new_update_distance = distanceMm_left();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
-        if (new_update_distance <= 50) {
+        if (new_update_distance <= 150) {
           count += 1;
-        } else if (new_update_distance > 50) {
+        } else if (new_update_distance > 150) {
           count = 0;
         }
 
-        if (count >= 5) {
+        if (count >= 3) {
           data = 11;
           master_write_start();
           delay(1000); // DC 멈출 때까지 기다림
@@ -201,13 +258,13 @@ void loop() {
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
-        if (new_update_distance <= 50) {
+        if (new_update_distance <= 150) {
           count += 1;
-        } else if (new_update_distance > 50) {
+        } else if (new_update_distance > 150) {
           count = 0;
         }
 
-        if (count >= 5) {
+        if (count >= 3) {
           data = 16;
           master_write_start();
           delay(1000); // DC 멈출 때까지 기다림
@@ -239,6 +296,15 @@ void loop() {
 
       showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, lengthmm_left, lengthmm_right);
 
+      if (distance_front <= 150) {
+        data = 50;
+        master_write_start();
+
+        delay(10);
+
+        decision = true;
+      }
+
       delay(Time_Interval);
 
       decision_left = decideParking_T(lengthmm_left);
@@ -267,13 +333,13 @@ void loop() {
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
-        if (new_update_distance <= 50) {
+        if (new_update_distance <= 150) {
           count += 1;
-        } else if (new_update_distance > 50) {
+        } else if (new_update_distance > 150) {
           count = 0;
         }
 
-        if (count >= 5) {
+        if (count >= 3) {
           data = 21;
           master_write_start();
           delay(1000); // DC 멈출 때까지 기다림
@@ -297,13 +363,13 @@ void loop() {
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
-        if (new_update_distance <= 50) {
+        if (new_update_distance <= 150) {
           count += 1;
-        } else if (new_update_distance > 50) {
+        } else if (new_update_distance > 150) {
           count = 0;
         }
 
-        if (count >= 5) {
+        if (count >= 3) {
           data = 26;
           master_write_start();
           delay(1000); // DC 멈출 때까지 기다림
@@ -315,7 +381,7 @@ void loop() {
       }
     }
   }
-
+  decision = false;
   Serial.print(".");
 
   delay(1000);
@@ -374,7 +440,7 @@ uint16_t distanceMm_front() {
 
   PORTD &= ~pinTrig_front;
 
-  uint16_t duration = pulseIn(5, HIGH, 100000);
+  uint16_t duration = pulseIn(5, HIGH);
 
   uint16_t mm = (duration/2) * 0.343;
   return mm;
@@ -390,7 +456,7 @@ uint16_t distanceMm_back() {
 
   PORTD &= ~pinTrig_back;
 
-  uint16_t duration = pulseIn(7, HIGH, 100000);
+  uint16_t duration = pulseIn(7, HIGH);
 
   uint16_t mm = (duration/2) * 0.343;
   return mm;
@@ -406,7 +472,7 @@ uint16_t distanceMm_left() {
 
   PORTB &= ~pinTrig_left;
 
-  uint16_t duration = pulseIn(9, HIGH, 100000);
+  uint16_t duration = pulseIn(9, HIGH);
 
   uint16_t mm = (duration/2) * 0.343;
   return mm;
@@ -422,7 +488,7 @@ uint16_t distanceMm_right() {
 
   PORTB &= ~pinTrig_right;
 
-  uint16_t duration = pulseIn(11, HIGH, 100000);
+  uint16_t duration = pulseIn(11, HIGH);
 
   uint16_t mm = (duration/2) * 0.343;
   return mm;
@@ -461,21 +527,23 @@ void showDistance(uint16_t d_1, uint16_t d_2, uint16_t d_3, uint16_t d_4, uint8_
 }
 
 // 횟수 카운트
-uint8_t countLength_P(uint8_t width, uint8_t cnt) {
-  if(width > Car_Width + 30) {
+uint8_t countLength_P(uint16_t width, uint16_t cnt) {
+  if(width >= Car_Width + 160) {
     cnt += 1;
   }
-  else if(width < Car_Width + 30) {
+  // else if(width < Car_Width + 60) {/
+  else {
     cnt = 0;
   }
   return cnt;
 }
 
-uint8_t countWidth_T(uint8_t length, uint8_t cnt) {
-  if(length > Car_Length + 10) {
+uint8_t countWidth_T(uint16_t length, uint16_t cnt) {
+  if(length >= Car_Length + 120) {
     cnt += 1;
   }
-  else if(length < Car_Length + 10) {
+  // else if(length < Car_Length + 20) {/
+  else {
     cnt = 0;
   }
   return cnt;
