@@ -48,7 +48,7 @@ volatile uint8_t count_front = 0;
 volatile uint8_t count_back = 0;
 volatile uint8_t count = 0;
 
-volatile uint16_t ir_value = 0;
+volatile uint16_t ir_value = 600;
 
 void master_setup();
 void master_communication_start();
@@ -204,11 +204,20 @@ void loop() {
       data = 10;
       master_write_start();
       
-      delay(2500); // DC 멈출 때까지 기다림
+      delay(3000); // DC 멈출 때까지 기다림
 
       ADCSRA |= (1 << ADSC);    // 주차공간 찾으면 ADC 시작
 
       while (decision == true) { // 왼쪽 물체에 가까워질 때까지
+        ADC_pulse();
+
+        if (data == 30) {
+          master_write_start();
+          delay(1000); // DC 멈출 때까지 기다림
+
+          data = 99; // data 값 초기화
+        }
+
         uint16_t new_update_distance = distanceMm_left();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
@@ -231,15 +240,6 @@ void loop() {
           // ADC_disable();
           ADCSRA &= ~(1 << ADEN);
         }
-
-        ADC_pulse();
-
-        if (data == 30) {
-          master_write_start();
-          delay(1000); // DC 멈출 때까지 기다림
-
-          data = 99; // data 값 초기화
-        }
       }
     } else if (direction == 2) { // 오른쪽 공간 찾았으면
       ADC_left_setup();  // 왼쪽 적외선 센서 활성화
@@ -251,11 +251,20 @@ void loop() {
       data = 15;
       master_write_start();
 
-      delay(2500); // DC 멈출 때까지 기다림
+      delay(3000); // DC 멈출 때까지 기다림
 
       ADCSRA |= (1 << ADSC);    // 주차공간 찾으면 ADC 시작
 
       while (decision == true) { // 오른쪽 물체에 가까워질 때까지
+        ADC_pulse();
+
+        if (data == 30) {
+          master_write_start();
+          delay(1000); // DC 멈출 때까지 기다림
+
+          data = 99; // data 값 초기화
+        }
+
         uint16_t new_update_distance = distanceMm_right();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
@@ -277,15 +286,6 @@ void loop() {
 
           // ADC_disable();
           ADCSRA &= ~(1 << ADEN);
-        }
-
-        ADC_pulse();
-
-        if (data == 30) {
-          master_write_start();
-          delay(1000); // DC 멈출 때까지 기다림
-
-          data = 99; // data 값 초기화
         }
       }
     }
@@ -348,6 +348,15 @@ void loop() {
       ADCSRA |= (1 << ADSC);    // 주차공간 찾으면 ADC 시작
 
       while (decision == true) { // 뒤쪽 물체에 가까워질 때까지
+        ADC_pulse();
+
+        if (data == 30) {
+          master_write_start();
+          delay(1000); // DC 멈출 때까지 기다림
+
+          data = 99; // data 값 초기화
+        }
+
         uint16_t new_update_distance = distanceMm_back();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
@@ -370,15 +379,6 @@ void loop() {
           // ADC_disable();
           ADCSRA &= ~(1 << ADEN);
         }
-
-        ADC_pulse();
-
-        if (data == 30) {
-          master_write_start();
-          delay(1000); // DC 멈출 때까지 기다림
-
-          data = 99; // data 값 초기화
-        }
       }
     } else if (direction == 2) { // 오른쪽 공간 찾았으면
       ADC_front_setup();  // 앞쪽 적외선 센서 활성화
@@ -390,11 +390,20 @@ void loop() {
       data = 25;
       master_write_start();
       
-      delay(2500); // DC 멈출 때까지 기다림
+      delay(4500); // DC 멈출 때까지 기다림
 
       ADCSRA |= (1 << ADSC);    // 주차공간 찾으면 ADC 시작
 
       while (decision == true) { // 뒤쪽 물체에 가까워질 때까지
+        ADC_pulse();
+
+        if (data == 30) {
+          master_write_start();
+          delay(1000); // DC 멈출 때까지 기다림
+
+          data = 99; // data 값 초기화
+        }
+
         uint16_t new_update_distance = distanceMm_back();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
@@ -416,15 +425,6 @@ void loop() {
 
           // ADC_disable();
           ADCSRA &= ~(1 << ADEN);
-        }
-
-        ADC_pulse();
-
-        if (data == 30) {
-          master_write_start();
-          delay(1000); // DC 멈출 때까지 기다림
-
-          data = 99; // data 값 초기화
         }
       }
     }
@@ -723,14 +723,48 @@ void external_setup() {
 }
 
 // 흰 선 감지 -> high, 검은색(주차장 바닥) 감지 -> low
+// void ADC_pulse() {
+//   // Serial.print("ir_value: ");
+//   // Serial.println(ir_value);
+//   if (600 <= ir_value < 1023) {
+//     Serial.print("ir_value600: ");
+//     Serial.println(ir_value);
+//     PORTD &= ~ir_output;
+//   } else {
+//     Serial.print("ir_value150: ");
+//     Serial.println(ir_value);
+//     PORTD |= ir_output;
+//   }
+
+//   // if (600 <= ir_value < 1023) {
+//   //   Serial.print("ir_value600: ");
+//   //   Serial.println(ir_value);
+//   //   PORTD &= ~ir_output;
+//   // } else if (20 < ir_value < 150) {
+//   //   Serial.print("ir_value150: ");
+//   //   Serial.println(ir_value);
+//   //   PORTD |= ir_output;
+//   // }
+
+//   ir_value = ADC;
+
+//   // if (0 < ir_value <= 150) {
+//   //   PORTD |= ir_output;
+//   // } else {
+//   //   PORTD &= ~ir_output;
+//   // }
+// }
+
 void ADC_pulse() {
-  ir_value = ADC;
-  Serial.print("ir_value: ");
+
+  Serial.print("ir_value:");
   Serial.println(ir_value);
 
   if (ir_value >= 600) {
     PORTD &= ~ir_output;
-  } else if (ir_value < 150) {
+  } else if (ir_value <= 250) {
     PORTD |= ir_output;
   }
+
+  ir_value = ADC;
 }
