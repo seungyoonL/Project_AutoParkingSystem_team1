@@ -69,8 +69,6 @@ uint8_t countWidth_T(uint16_t length, uint16_t cnt);
 bool decideParking_P(uint16_t length);
 bool decideParking_T(uint16_t width);
 
-// void ADC_setup();
-// void ADC_disable();
 void ADC_front_setup();
 void ADC_back_setup();
 void ADC_left_setup();
@@ -116,12 +114,13 @@ ISR(TWI_vect) {
   }
 }
 
+// 외부 인터럽트 서비스 루틴
 ISR(INT0_vect) {
   decision = false;
   direction = 0;
-  ir_value = 0;
-  // ADC_disable();
-  ADCSRA &= ~(1 << ADEN);
+  ir_value = 600;
+
+  ADCSRA &= ~(1 << ADEN);   // ADC 비활성화
 
   data = 30;
 }
@@ -131,7 +130,6 @@ void setup() {
   bluetooth.begin(9600);
   master_setup();
   ultraSonic_setup();
-  // ADC_setup();
   infraredray_setup();
   external_setup();
 }
@@ -158,6 +156,7 @@ void loop() {
 
     while(!decision) { // 주차 공간 찾기
 
+      // 전방, 후방, 좌측, 우측 거리 측정
       uint16_t distance_front = distanceMm_front();
       uint16_t distance_back = distanceMm_back();
       uint16_t distance_left = distanceMm_left();
@@ -171,7 +170,8 @@ void loop() {
 
       showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, lengthmm_left, lengthmm_right);
 
-      if (distance_front <= 200) {    // 전방 20cm 이내에 장애물 감지되면 정지
+      // 전방 20cm 이내에 장애물 감지되면 정지
+      if (distance_front <= 200) {
         data = 50;
         master_write_start();
 
@@ -196,7 +196,6 @@ void loop() {
 
     if (direction == 1) { // 왼쪽 공간 찾았으면
       ADC_right_setup();  // 오른쪽 적외선 센서 활성화
-      // delay(10);
 
       count_left = 0;
       count_right = 0;
@@ -218,10 +217,12 @@ void loop() {
           data = 99; // data 값 초기화
         }
 
+        // 주차하면서 거리값을 계속 받아옴
         uint16_t new_update_distance = distanceMm_left();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
+        // 남은 공간이 15cm 이하이면 정지
         if (new_update_distance <= 150) {
           count += 1;
         } else if (new_update_distance > 150) {
@@ -237,7 +238,6 @@ void loop() {
           direction = 0; // 방향 초기화
           data = 99; // data 값 초기화
 
-          // ADC_disable();
           ADCSRA &= ~(1 << ADEN);
         }
       }
@@ -265,10 +265,12 @@ void loop() {
           data = 99; // data 값 초기화
         }
 
+        // 주차하면서 거리값을 계속 받아옴
         uint16_t new_update_distance = distanceMm_right();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
+        // 남은 공간이 15cm 이하이면 정지
         if (new_update_distance <= 150) {
           count += 1;
         } else if (new_update_distance > 150) {
@@ -284,7 +286,6 @@ void loop() {
           direction = 0; // 방향 초기화
           data = 99; // data 값 초기화
 
-          // ADC_disable();
           ADCSRA &= ~(1 << ADEN);
         }
       }
@@ -297,6 +298,7 @@ void loop() {
 
     while(!decision) { // 주차공간 찾기
 
+      // 전방, 후방, 좌측, 우측 거리 측정
       uint16_t distance_front = distanceMm_front();
       uint16_t distance_back = distanceMm_back();
       uint16_t distance_left = distanceMm_left();
@@ -357,10 +359,12 @@ void loop() {
           data = 99; // data 값 초기화
         }
 
+        // 주차하면서 거리값을 계속 받아옴
         uint16_t new_update_distance = distanceMm_back();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
+        // 남은 공간이 15cm 이하이면 정지
         if (new_update_distance <= 150) {
           count += 1;
         } else if (new_update_distance > 150) {
@@ -404,10 +408,12 @@ void loop() {
           data = 99; // data 값 초기화
         }
 
+        // 주차하면서 거리값을 계속 받아옴
         uint16_t new_update_distance = distanceMm_back();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
+        // 남은 공간이 15cm 이하이면 정지
         if (new_update_distance <= 150) {
           count += 1;
         } else if (new_update_distance > 150) {
@@ -423,7 +429,6 @@ void loop() {
           direction = 0; // 방향 초기화
           data = 99; // data 값 초기화
 
-          // ADC_disable();
           ADCSRA &= ~(1 << ADEN);
         }
       }
@@ -578,9 +583,7 @@ void showDistance(uint16_t d_1, uint16_t d_2, uint16_t d_3, uint16_t d_4, uint8_
 uint8_t countLength_P(uint16_t width, uint16_t cnt) {
   if(width >= Car_Width + 160) {
     cnt += 1;
-  }
-  // else if(width < Car_Width + 60) {/
-  else {
+  } else {
     cnt = 0;
   }
   return cnt;
@@ -589,19 +592,17 @@ uint8_t countLength_P(uint16_t width, uint16_t cnt) {
 uint8_t countWidth_T(uint16_t length, uint16_t cnt) {
   if(length >= Car_Length + 120) {
     cnt += 1;
-  }
-  // else if(length < Car_Length + 20) {/
-  else {
+  } else {
     cnt = 0;
   }
   return cnt;
 }
 
+// 주차 가능 여부 판단
 bool decideParking_P(uint16_t length) {
   if(length >= Specific_Count * Time_Interval * Velocity_MeterperSecond) {
     return 1;
-  }
-  else {
+  } else {
     return 0;
   }
 }
@@ -615,8 +616,7 @@ bool decideParking_T(uint16_t width) {
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-
+// 전방 적외선 센서 설정 A0
 void ADC_front_setup() {
   ADMUX &= ~ (1 << REFS1);
   ADMUX |= (1 << REFS0);
@@ -632,6 +632,7 @@ void ADC_front_setup() {
   ADCSRB &= ~ ((1 << ADTS2) | (1 << ADTS1) | (1 << ADTS0));
 }
 
+// 후방 적외선 센서 설정 A1
 void ADC_back_setup() {
   ADMUX &= ~ (1 << REFS1);
   ADMUX |= (1 << REFS0);
@@ -648,6 +649,7 @@ void ADC_back_setup() {
   ADCSRB &= ~ ((1 << ADTS2) | (1 << ADTS1) | (1 << ADTS0));
 }
 
+// 좌측방 적외선 센서 설정 A2
 void ADC_left_setup() {
   ADMUX &= ~ (1 << REFS1);
   ADMUX |= (1 << REFS0);
@@ -664,6 +666,7 @@ void ADC_left_setup() {
   ADCSRB &= ~ ((1 << ADTS2) | (1 << ADTS1) | (1 << ADTS0));
 }
 
+// 우측방 적외선 센서 설정 A3
 void ADC_right_setup() {
   ADMUX &= ~ (1 << REFS1);
   ADMUX |= (1 << REFS0);
@@ -680,40 +683,12 @@ void ADC_right_setup() {
   ADCSRB &= ~ ((1 << ADTS2) | (1 << ADTS1) | (1 << ADTS0));
 }
 
-// void ADC_disable() {
-//   ADCSRA &= ~(1 << ADEN);
-// }
-
-// ADC_xxx_setup() 함수에서 ADC Enable, 아날로그 핀 지정
-// void ADC_front_setup() {
-//   ADMUX &= ~((1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0));
-// }
-
-// void ADC_back_setup() {
-//   ADCSRA |= (1 << ADEN);
-
-//   ADMUX &= ~ ((1 << MUX3) | (1 << MUX2) | (1 << MUX1));
-//   ADMUX |= (1 << MUX0);
-// }
-
-// void ADC_left_setup() {
-//   ADCSRA |= (1 << ADEN);
-
-//   ADMUX &= ~ ((1 << MUX3) | (1 << MUX2) | (1 << MUX0));
-//   ADMUX |= (1 << MUX1);
-// }
-
-// void ADC_right_setup() {
-//   ADCSRA |= (1 << ADEN);
-
-//   ADMUX &= ~ ((1 << MUX3) | (1 << MUX2));
-//   ADMUX |= ((1 << MUX1) | (1 << MUX0));
-// }
-
+// 적외선 센서 연결핀 설정
 void infraredray_setup() {
   DDRD |= ir_output;
 }
 
+// 외부 인터럽트 설정
 void external_setup() {
   SREG |= (1 << SREG_I);
 
@@ -723,43 +698,12 @@ void external_setup() {
 }
 
 // 흰 선 감지 -> high, 검은색(주차장 바닥) 감지 -> low
-// void ADC_pulse() {
-//   // Serial.print("ir_value: ");
-//   // Serial.println(ir_value);
-//   if (600 <= ir_value < 1023) {
-//     Serial.print("ir_value600: ");
-//     Serial.println(ir_value);
-//     PORTD &= ~ir_output;
-//   } else {
-//     Serial.print("ir_value150: ");
-//     Serial.println(ir_value);
-//     PORTD |= ir_output;
-//   }
-
-//   // if (600 <= ir_value < 1023) {
-//   //   Serial.print("ir_value600: ");
-//   //   Serial.println(ir_value);
-//   //   PORTD &= ~ir_output;
-//   // } else if (20 < ir_value < 150) {
-//   //   Serial.print("ir_value150: ");
-//   //   Serial.println(ir_value);
-//   //   PORTD |= ir_output;
-//   // }
-
-//   ir_value = ADC;
-
-//   // if (0 < ir_value <= 150) {
-//   //   PORTD |= ir_output;
-//   // } else {
-//   //   PORTD &= ~ir_output;
-//   // }
-// }
-
 void ADC_pulse() {
 
   Serial.print("ir_value:");
   Serial.println(ir_value);
 
+  // 검은색: 600 이상, 흰색: 250 이하
   if (ir_value >= 600) {
     PORTD &= ~ir_output;
   } else if (ir_value <= 250) {

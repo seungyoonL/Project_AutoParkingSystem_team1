@@ -315,15 +315,6 @@ void dc_gobackgoback() {     // PWM 속도 적당히 조절 후 앞으로 돌리
 }
 
 void dc_allstop() {   //PWM 속도 적당히 조절하여 가만히 있도록 하기
-  // PORTB &=~ rearDC2;
-  // PORTB &=~ rearDC1;
-  // PORTB &=~ rearDC2left;
-  // PORTB &=~ rearDC1left;  
-  // PORTD &=~ frontDC1left;
-  // PORTD &=~ frontDC2left;
-  // PORTD &=~ frontDC1;
-  // PORTD &=~ frontDC2;
-  // delay(1500);
   PORTB &= ~(rearDC2 | rearDC1 | rearDC2left | rearDC1left); 
   PORTD &= ~(frontDC1left | frontDC2left | frontDC1 | frontDC2);
   delay(1500);
