@@ -70,21 +70,129 @@ void setup() {
 void loop() {
   slave_communication_start(); // 통신 시작
 
-  if (data == 1) { // 평행주차(왼쪽)
-    while (data == 1);
+  if (data == 1) { // 평행주차
+    while (data == 1); // 후진 기다림
 
-    if (data == 11) {
+    if (data == 10) { // 바퀴 회전
       delay(2500);
 
-      servo_front_left_180();
-      servo_front_right_180();
-      servo_rear_left_180();
-      servo_rear_right_180();
+      servo_front_left_90();
+      servo_front_right_90();
+      servo_rear_left_90();
+      servo_rear_right_90();
 
-      while(data == 11);
+      while(data == 10); // 왼쪽 이동 기다림
 
-      if (data == 12) {
+      if (data == 11 || data == 30) { // 이동 완료시
         delay(1000);
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
+
+        data = 60;
+      }
+    } else if (data == 15) { // 바퀴 회전
+      delay(2500);
+
+      servo_front_left_90();
+      servo_front_right_90();
+      servo_rear_left_90();
+      servo_rear_right_90();
+
+      while(data == 15); // 오른쪽 이동 기다림
+
+      if (data == 16 || data == 30) { // 이동 완료시
+        delay(1000);
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
+
+        data = 60;
+      }
+    }
+  } else if (data == 2) { // T자 주차
+    while (data == 2); // 후진 기다림
+
+    if (data == 20) {
+      delay(2500);
+      // 60도 회전
+      servo_front_left_60();
+      servo_front_right_60();
+      servo_rear_left_60();
+      servo_rear_right_60();
+
+      delay(2500);
+      // 후진 하기 위해 정렬
+      servo_front_left_0();
+      servo_front_right_0();
+      servo_rear_left_0();
+      servo_rear_right_0();
+
+      servo_front_left_0();
+      servo_front_right_0();
+      servo_rear_left_0();
+      servo_rear_right_0();
+
+      while(data == 20); // 후진 기다림
+
+      if (data == 21 || data == 30) { // 주차 완료시
+        delay(1000);
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
+
+        data = 60;
+      }
+    } else if (data == 25) {
+      delay(2500);
+      // 60도 회전
+      servo_front_left_60();
+      servo_front_right_60();
+      servo_rear_left_60();
+      servo_rear_right_60();
+
+      delay(2500);
+      // 후진 하기 위해 정렬
+      servo_front_left_0();
+      servo_front_right_0();
+      servo_rear_left_0();
+      servo_rear_right_0();
+
+      servo_front_left_0();
+      servo_front_right_0();
+      servo_rear_left_0();
+      servo_rear_right_0();
+
+      while(data == 25); // 후진 기다림
+
+      if (data == 26 || data == 30) { // 주차 완료시
+        delay(1000);
+
+        servo_front_left_0();
+        servo_front_right_0();
+        servo_rear_left_0();
+        servo_rear_right_0();
 
         servo_front_left_0();
         servo_front_right_0();
@@ -123,27 +231,23 @@ void servo_setup() {
   servo_front_right_0();
   servo_rear_left_0();
   servo_rear_right_0();
+
+  servo_front_left_0();
+  servo_front_right_0();
+  servo_rear_left_0();
+  servo_rear_right_0();
 }
 
-void servo_front_left_0() { // 서보모터 0도                     
+void servo_front_left_0() { // 서보모터 기준도                     
    for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_LEFT_SERVO;
-    delayMicroseconds(500);
-    PORTD &=~ FRONT_LEFT_SERVO;
-    delayMicroseconds(19500);
-  }
-}
-
-void servo_front_left_90() { // 서보모터 90도
-  for(uint8_t i = 0; i < 50; i++) {
-    PORTD |= FRONT_LEFT_SERVO;
     delayMicroseconds(1500);
     PORTD &=~ FRONT_LEFT_SERVO;
     delayMicroseconds(18500);
   }
 }
 
-void servo_front_left_180() { // 서보모터 180도
+void servo_front_left_90() { // 서보모터 오른90도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_LEFT_SERVO;
     delayMicroseconds(2500);
@@ -152,16 +256,16 @@ void servo_front_left_180() { // 서보모터 180도
   }
 }
 
-void servo_front_right_0() { // 서보모터 0도                     
+void servo_front_left_60() { // 서보모터 60도
   for(uint8_t i = 0; i < 50; i++) {
-    PORTD |= FRONT_RIGHT_SERVO;
-    delayMicroseconds(500);
-    PORTD &=~ FRONT_RIGHT_SERVO;
-    delayMicroseconds(19500);
+    PORTD |= FRONT_LEFT_SERVO;
+    delayMicroseconds(2100);
+    PORTD &=~ FRONT_LEFT_SERVO;
+    delayMicroseconds(17900);
   }
 }
 
-void servo_front_right_90() { // 서보모터 90도
+void servo_front_right_0() { // 서보모터 기준도                     
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_RIGHT_SERVO;
     delayMicroseconds(1500);
@@ -170,52 +274,52 @@ void servo_front_right_90() { // 서보모터 90도
   }
 }
 
-void servo_front_right_180() { // 서보모터 180도
+void servo_front_right_90() { // 서보모터 왼90도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_RIGHT_SERVO;
-    delayMicroseconds(2500);
+    delayMicroseconds(500);
     PORTD &=~ FRONT_RIGHT_SERVO;
-    delayMicroseconds(17500);
+    delayMicroseconds(19500);
   }
 }
 
-void servo_rear_left_0() { // 서보모터 0도                     
+void servo_front_right_60() { // 서보모터 60도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= FRONT_RIGHT_SERVO;
+    delayMicroseconds(900);
+    PORTD &=~ FRONT_RIGHT_SERVO;
+    delayMicroseconds(19100);
+  }
+}
+
+void servo_rear_left_0() { // 서보모터 기준도                     
    for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_LEFT_SERVO;
-    delayMicroseconds(500);
-    PORTD &=~ REAR_LEFT_SERVO;
-    delayMicroseconds(19500);
-  }
-}
-
-void servo_rear_left_90() { // 서보모터 90도
-  for(uint8_t i = 0; i < 50; i++) {
-    PORTD |= REAR_LEFT_SERVO;
     delayMicroseconds(1500);
     PORTD &=~ REAR_LEFT_SERVO;
     delayMicroseconds(18500);
   }
 }
 
-void servo_rear_left_180() { // 서보모터 180도
+void servo_rear_left_90() { // 서보모터 오른90도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_LEFT_SERVO;
-    delayMicroseconds(2500);
-    PORTD &=~ REAR_LEFT_SERVO;
-    delayMicroseconds(17500);
-  }
-}
-
-void servo_rear_right_0() { // 서보모터 0도                     
-  for(uint8_t i = 0; i < 50; i++) {
-    PORTD |= REAR_RIGHT_SERVO;
     delayMicroseconds(500);
-    PORTD &=~ REAR_RIGHT_SERVO;
+    PORTD &=~ REAR_LEFT_SERVO;
     delayMicroseconds(19500);
   }
 }
 
-void servo_rear_right_90() { // 서보모터 90도
+void servo_rear_left_60() { // 서보모터 60도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= REAR_LEFT_SERVO;
+    delayMicroseconds(900);
+    PORTD &=~ REAR_LEFT_SERVO;
+    delayMicroseconds(19100);
+  }
+}
+
+void servo_rear_right_0() { // 서보모터 기준도                     
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_RIGHT_SERVO;
     delayMicroseconds(1500);
@@ -224,11 +328,20 @@ void servo_rear_right_90() { // 서보모터 90도
   }
 }
 
-void servo_rear_right_180() { // 서보모터 180도
+void servo_rear_right_90() { // 서보모터 오른90도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_RIGHT_SERVO;
     delayMicroseconds(2500);
     PORTD &=~ REAR_RIGHT_SERVO;
     delayMicroseconds(17500);
+  }
+}
+
+void servo_rear_right_60() { // 서보모터 60도
+  for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= REAR_RIGHT_SERVO;
+    delayMicroseconds(2100);
+    PORTD &=~ REAR_RIGHT_SERVO;
+    delayMicroseconds(17900);
   }
 }

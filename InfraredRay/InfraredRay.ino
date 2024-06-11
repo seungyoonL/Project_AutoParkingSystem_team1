@@ -20,8 +20,15 @@ void init_ADC() {
   ADMUX |= (1 << REFS0);
 
   ADMUX &= ~ (1 << ADLAR);
+  // ADMUX |= (1 << ADLAR);
 
-  ADMUX &= ~ ((1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0));
+  // ADMUX &= ~ ((1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0));
+  
+  ADMUX &= ~ ((1 << MUX3) | (1 << MUX2) | (1 << MUX0));
+  ADMUX |= (1 << MUX1);
+
+  // ADMUX &= ~ ((1 << MUX3) | (1 << MUX2));
+  // ADMUX |= (1 << MUX1) | (1 << MUX0);
 
   ADCSRA |= (1 << ADEN);
 
@@ -47,7 +54,8 @@ void loop() {
   ADCSRA |= (1 << ADSC);
 
   uint16_t value = ADC;
+  // uint8_t value = ADCH;
   Serial.println(value);
 
-  delay(100);
+  delay(50);
 }
