@@ -203,62 +203,71 @@ void servo_setup() {
   servo_rear_right_0();
 }
 
-void servo_front_left_0() { // 서보모터 0도                     
+void servo_front_left_0() { // 서보모터 기준도                     
    for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_LEFT_SERVO;
-    delayMicroseconds(500);
+    delayMicroseconds(1500);
     PORTD &=~ FRONT_LEFT_SERVO;
-    delayMicroseconds(19500);
+    delayMicroseconds(18500);
   }
 }
 
 void servo_front_left_90() { // 서보모터 90도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_LEFT_SERVO;
-    delayMicroseconds(1500);
+    delayMicroseconds(2500);
     PORTD &=~ FRONT_LEFT_SERVO;
-    delayMicroseconds(18500);
+    delayMicroseconds(17500);
   }
 }
 
 void servo_front_left_60() { // 서보모터 60도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_LEFT_SERVO;
-    delayMicroseconds(1300);
+    delayMicroseconds(2100);
     PORTD &=~ FRONT_LEFT_SERVO;
-    delayMicroseconds(18700);
+    delayMicroseconds(17900);
   }
 }
 
-void servo_front_right_0() { // 서보모터 0도                     
+void servo_front_right_0() { // 서보모터 기준도                     
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_RIGHT_SERVO;
-    delayMicroseconds(500);
+    delayMicroseconds(1500);
     PORTD &=~ FRONT_RIGHT_SERVO;
-    delayMicroseconds(19500);
+    delayMicroseconds(18500);
   }
 }
 
 void servo_front_right_90() { // 서보모터 90도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_RIGHT_SERVO;
-    delayMicroseconds(1500);
+    delayMicroseconds(500);
     PORTD &=~ FRONT_RIGHT_SERVO;
-    delayMicroseconds(18500);
+    delayMicroseconds(19500);
   }
 }
 
 void servo_front_right_60() { // 서보모터 60도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_RIGHT_SERVO;
-    delayMicroseconds(1300);
+    delayMicroseconds(900);
     PORTD &=~ FRONT_RIGHT_SERVO;
-    delayMicroseconds(18700);
+    delayMicroseconds(19100);
   }
 }
 
 void servo_rear_left_0() { // 서보모터 0도                     
    for(uint8_t i = 0; i < 50; i++) {
+    PORTD |= REAR_LEFT_SERVO;
+    delayMicroseconds(1500);
+    PORTD &=~ REAR_LEFT_SERVO;
+    delayMicroseconds(18500);
+  }
+}
+
+void servo_rear_left_90() { // 서보모터 90도
+  for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_LEFT_SERVO;
     delayMicroseconds(500);
     PORTD &=~ REAR_LEFT_SERVO;
@@ -266,28 +275,19 @@ void servo_rear_left_0() { // 서보모터 0도
   }
 }
 
-void servo_rear_left_90() { // 서보모터 90도
-  for(uint8_t i = 0; i < 50; i++) {
-    PORTD |= REAR_LEFT_SERVO;
-    delayMicroseconds(1500);
-    PORTD &=~ REAR_LEFT_SERVO;
-    delayMicroseconds(18500);
-  }
-}
-
 void servo_rear_left_60() { // 서보모터 60도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_LEFT_SERVO;
-    delayMicroseconds(1200);
+    delayMicroseconds(900);
     PORTD &=~ REAR_LEFT_SERVO;
-    delayMicroseconds(18700);
+    delayMicroseconds(19100);
   }
 }
 
-void servo_rear_right_0() { // 서보모터 0도                     
+void servo_rear_right_0() { // 서보모터 기준도                     
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_RIGHT_SERVO;
-    delayMicroseconds(500);
+    delayMicroseconds(1500);
     PORTD &=~ REAR_RIGHT_SERVO;
     delayMicroseconds(19500);
   }
@@ -296,17 +296,17 @@ void servo_rear_right_0() { // 서보모터 0도
 void servo_rear_right_90() { // 서보모터 90도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_RIGHT_SERVO;
-    delayMicroseconds(1500);
+    delayMicroseconds(2500);
     PORTD &=~ REAR_RIGHT_SERVO;
-    delayMicroseconds(18500);
+    delayMicroseconds(17500);
   }
 }
 
 void servo_rear_right_60() { // 서보모터 60도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_RIGHT_SERVO;
-    delayMicroseconds(1300);
+    delayMicroseconds(2100);
     PORTD &=~ REAR_RIGHT_SERVO;
-    delayMicroseconds(18700);
+    delayMicroseconds(17900);
   }
 }
