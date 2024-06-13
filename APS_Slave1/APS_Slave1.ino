@@ -123,7 +123,7 @@ void loop() {
         data = 60; // data 값 초기화
       }
     }
-  } else if (data == 2) {
+  } else if (data == 2) {   // T자 주차
     while (data == 2) { // 앞으로 가면서 센서값 받아오기
       dc_gogogogo();
     }
@@ -142,7 +142,7 @@ void loop() {
 
       delay(2000); // 바퀴 회전 기다림
 
-      for(uint8_t i = 0; i < 7; i++){ // 90도 회전
+      for(uint8_t i = 0; i < 9; i++){ // 90도 회전
         dc_backgobackgo();
       }
 
@@ -165,7 +165,7 @@ void loop() {
 
       delay(2000); // 바퀴 회전 기다림
 
-      for(uint8_t i = 0; i < 7; i++){ // 90도 회전
+      for(uint8_t i = 0; i < 9; i++){ // 90도 회전
         dc_gobackgoback();
       }
 

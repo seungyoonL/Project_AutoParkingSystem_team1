@@ -712,3 +712,4 @@ void ADC_pulse() {
 
   ir_value = ADC;
 }
+
