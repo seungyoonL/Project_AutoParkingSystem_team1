@@ -13,12 +13,9 @@
 #define pinTrig_right     0x04  // 10
 #define pinEcho_right     0x08  // 11
 
-<<<<<<< HEAD
 // 적외선 센서 출력 핀
 #define ir_output          0x04  // 2
 
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
 // 차량 전장, 전폭 설정
 #define Car_Length        180
 #define Car_Width         140
@@ -28,11 +25,7 @@
 
 #define Velocity_MeterperSecond   1
 
-<<<<<<< HEAD
 #define Specific_Count    8
-=======
-#define Specific_Count    9
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
 
 SoftwareSerial bluetooth(BT_TX, BT_RX);
 
@@ -55,11 +48,8 @@ volatile uint8_t count_front = 0;
 volatile uint8_t count_back = 0;
 volatile uint8_t count = 0;
 
-<<<<<<< HEAD
 volatile uint16_t ir_value = 600;
 
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
 void master_setup();
 void master_communication_start();
 void master_write_start();
@@ -79,7 +69,6 @@ uint8_t countWidth_T(uint16_t length, uint16_t cnt);
 bool decideParking_P(uint16_t length);
 bool decideParking_T(uint16_t width);
 
-<<<<<<< HEAD
 void ADC_front_setup();
 void ADC_back_setup();
 void ADC_left_setup();
@@ -88,8 +77,6 @@ void infraredray_setup();
 void external_setup();
 void ADC_pulse();
 
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
 ISR(TWI_vect) {
   switch (TWSR & 0xF8) {
     case 0x08: // START 보내기 성공시
@@ -127,7 +114,6 @@ ISR(TWI_vect) {
   }
 }
 
-<<<<<<< HEAD
 // 외부 인터럽트 서비스 루틴
 ISR(INT0_vect) {
   decision = false;
@@ -139,18 +125,13 @@ ISR(INT0_vect) {
   data = 30;
 }
 
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
 void setup() {
   Serial.begin(9600);
   bluetooth.begin(9600);
   master_setup();
   ultraSonic_setup();
-<<<<<<< HEAD
   infraredray_setup();
   external_setup();
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
 }
 
 void loop() {
@@ -175,10 +156,7 @@ void loop() {
 
     while(!decision) { // 주차 공간 찾기
 
-<<<<<<< HEAD
       // 전방, 후방, 좌측, 우측 거리 측정
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
       uint16_t distance_front = distanceMm_front();
       uint16_t distance_back = distanceMm_back();
       uint16_t distance_left = distanceMm_left();
@@ -192,33 +170,8 @@ void loop() {
 
       showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, lengthmm_left, lengthmm_right);
 
-<<<<<<< HEAD
       // 전방 20cm 이내에 장애물 감지되면 정지
       if (distance_front <= 200) {
-=======
-      // if (bluetooth.available()) {
-      //   char received = bluetooth.read();
-      //   char dummy = bluetooth.read();
-      //   if (received == '0') {
-      //     data = 0;
-      //     chosen_slave = general_call;  // Slave 모두에게 보내기
-      //     master_write_start();
-      //     delay(10);
-
-      //     decision = true;
-      //   }
-      // }
-
-      //////////////////////////////////////////////////////////////////////
-      // if (data == 0) {  // 긴급정지
-      //   chosen_slave = general_call;  // Slave 모두에게 보내기
-      //   master_write_start();
-      //   delay(10);
-      // }
-      //////////////////////////////////////////////////////////////////////
-
-      if (distance_front <= 150) {
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         data = 50;
         master_write_start();
 
@@ -242,7 +195,6 @@ void loop() {
     }
 
     if (direction == 1) { // 왼쪽 공간 찾았으면
-<<<<<<< HEAD
       ADC_right_setup();  // 오른쪽 적외선 센서 활성화
 
       count_left = 0;
@@ -266,52 +218,11 @@ void loop() {
         }
 
         // 주차하면서 거리값을 계속 받아옴
-=======
-      count_left = 0;
-      count_right = 0;
-
-      // if (bluetooth.available()) {
-      //   char received = bluetooth.read();
-      //   char dummy = bluetooth.read();
-      //   if (received == '0') {
-      //     data = 0;
-      //     chosen_slave = general_call;  // Slave 모두에게 보내기
-      //     master_write_start();
-      //     delay(10);
-
-      //     decision = true;
-      //   }
-      // }
-
-      data = 10;
-      master_write_start();
-      
-      delay(2500); // DC 멈출 때까지 기다림
-
-      while (decision == true) { // 왼쪽 물체에 가까워질 때까지
-
-      //   if (bluetooth.available()) {
-      //   char received = bluetooth.read();
-      //   char dummy = bluetooth.read();
-      //   if (received == '0') {
-      //     data = 0;
-      //     chosen_slave = general_call;  // Slave 모두에게 보내기
-      //     master_write_start();
-      //     delay(10);
-
-      //     decision = true;
-      //   }
-      // }
-
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         uint16_t new_update_distance = distanceMm_left();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
-<<<<<<< HEAD
         // 남은 공간이 15cm 이하이면 정지
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         if (new_update_distance <= 150) {
           count += 1;
         } else if (new_update_distance > 150) {
@@ -326,7 +237,6 @@ void loop() {
           decision = false;
           direction = 0; // 방향 초기화
           data = 99; // data 값 초기화
-<<<<<<< HEAD
 
           ADCSRA &= ~(1 << ADEN);
         }
@@ -335,18 +245,12 @@ void loop() {
       ADC_left_setup();  // 왼쪽 적외선 센서 활성화
       delay(10);
 
-=======
-        }
-      }
-    } else if (direction == 2) { // 오른쪽 공간 찾았으면
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
       count_left = 0;
       count_right = 0;
 
       data = 15;
       master_write_start();
 
-<<<<<<< HEAD
       delay(3000); // DC 멈출 때까지 기다림
 
       ADCSRA |= (1 << ADSC);    // 주차공간 찾으면 ADC 시작
@@ -362,19 +266,11 @@ void loop() {
         }
 
         // 주차하면서 거리값을 계속 받아옴
-=======
-      delay(2500); // DC 멈출 때까지 기다림
-
-      while (decision == true) { // 오른쪽 물체에 가까워질 때까지
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         uint16_t new_update_distance = distanceMm_right();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
-<<<<<<< HEAD
         // 남은 공간이 15cm 이하이면 정지
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         if (new_update_distance <= 150) {
           count += 1;
         } else if (new_update_distance > 150) {
@@ -389,11 +285,8 @@ void loop() {
           decision = false;
           direction = 0; // 방향 초기화
           data = 99; // data 값 초기화
-<<<<<<< HEAD
 
           ADCSRA &= ~(1 << ADEN);
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         }
       }
     }
@@ -405,10 +298,7 @@ void loop() {
 
     while(!decision) { // 주차공간 찾기
 
-<<<<<<< HEAD
       // 전방, 후방, 좌측, 우측 거리 측정
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
       uint16_t distance_front = distanceMm_front();
       uint16_t distance_back = distanceMm_back();
       uint16_t distance_left = distanceMm_left();
@@ -422,11 +312,7 @@ void loop() {
 
       showDistance(distance_front, distance_back, distance_left, distance_right, count_left, count_right, lengthmm_left, lengthmm_right);
 
-<<<<<<< HEAD
       if (distance_front <= 200) {    // 전방 20cm 이내에 장애물 감지되면 정지
-=======
-      if (distance_front <= 150) {
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         data = 50;
         master_write_start();
 
@@ -450,12 +336,9 @@ void loop() {
     }
 
     if (direction == 1) { // 왼쪽 공간 찾았으면
-<<<<<<< HEAD
       ADC_front_setup();  // 앞쪽 적외선 센서 활성화
       delay(10);
 
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
       count_left = 0;
       count_right = 0;
 
@@ -464,7 +347,6 @@ void loop() {
       
       delay(4500); // DC 멈출 때까지 기다림
 
-<<<<<<< HEAD
       ADCSRA |= (1 << ADSC);    // 주차공간 찾으면 ADC 시작
 
       while (decision == true) { // 뒤쪽 물체에 가까워질 때까지
@@ -478,17 +360,11 @@ void loop() {
         }
 
         // 주차하면서 거리값을 계속 받아옴
-=======
-      while (decision == true) { // 뒤쪽 물체에 가까워질 때까지
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         uint16_t new_update_distance = distanceMm_back();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
-<<<<<<< HEAD
         // 남은 공간이 15cm 이하이면 정지
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         if (new_update_distance <= 150) {
           count += 1;
         } else if (new_update_distance > 150) {
@@ -503,7 +379,6 @@ void loop() {
           decision = false;
           direction = 0; // 방향 초기화
           data = 99; // data 값 초기화
-<<<<<<< HEAD
 
           // ADC_disable();
           ADCSRA &= ~(1 << ADEN);
@@ -513,18 +388,12 @@ void loop() {
       ADC_front_setup();  // 앞쪽 적외선 센서 활성화
       delay(10);
 
-=======
-        }
-      }
-    } else if (direction == 2) { // 오른쪽 공간 찾았으면
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
       count_left = 0;
       count_right = 0;
 
       data = 25;
       master_write_start();
       
-<<<<<<< HEAD
       delay(4500); // DC 멈출 때까지 기다림
 
       ADCSRA |= (1 << ADSC);    // 주차공간 찾으면 ADC 시작
@@ -540,19 +409,11 @@ void loop() {
         }
 
         // 주차하면서 거리값을 계속 받아옴
-=======
-      delay(2500); // DC 멈출 때까지 기다림
-
-      while (decision == true) { // 뒤쪽 물체에 가까워질 때까지
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         uint16_t new_update_distance = distanceMm_back();
         Serial.print("new_update_distance: ");
         Serial.println(new_update_distance);
 
-<<<<<<< HEAD
         // 남은 공간이 15cm 이하이면 정지
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         if (new_update_distance <= 150) {
           count += 1;
         } else if (new_update_distance > 150) {
@@ -567,11 +428,8 @@ void loop() {
           decision = false;
           direction = 0; // 방향 초기화
           data = 99; // data 값 초기화
-<<<<<<< HEAD
 
           ADCSRA &= ~(1 << ADEN);
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         }
       }
     }
@@ -725,13 +583,7 @@ void showDistance(uint16_t d_1, uint16_t d_2, uint16_t d_3, uint16_t d_4, uint8_
 uint8_t countLength_P(uint16_t width, uint16_t cnt) {
   if(width >= Car_Width + 160) {
     cnt += 1;
-<<<<<<< HEAD
   } else {
-=======
-  }
-  // else if(width < Car_Width + 60) {/
-  else {
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
     cnt = 0;
   }
   return cnt;
@@ -740,31 +592,17 @@ uint8_t countLength_P(uint16_t width, uint16_t cnt) {
 uint8_t countWidth_T(uint16_t length, uint16_t cnt) {
   if(length >= Car_Length + 120) {
     cnt += 1;
-<<<<<<< HEAD
   } else {
-=======
-  }
-  // else if(length < Car_Length + 20) {/
-  else {
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
     cnt = 0;
   }
   return cnt;
 }
 
-<<<<<<< HEAD
 // 주차 가능 여부 판단
 bool decideParking_P(uint16_t length) {
   if(length >= Specific_Count * Time_Interval * Velocity_MeterperSecond) {
     return 1;
   } else {
-=======
-bool decideParking_P(uint16_t length) {
-  if(length >= Specific_Count * Time_Interval * Velocity_MeterperSecond) {
-    return 1;
-  }
-  else {
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
     return 0;
   }
 }
@@ -776,7 +614,6 @@ bool decideParking_T(uint16_t width) {
   else {
     return 0;
   }
-<<<<<<< HEAD
 }
 
 // 전방 적외선 센서 설정 A0
@@ -876,6 +713,3 @@ void ADC_pulse() {
   ir_value = ADC;
 }
 
-=======
-}
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131

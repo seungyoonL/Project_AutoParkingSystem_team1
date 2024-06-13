@@ -76,15 +76,6 @@ void setup() {
 void loop() {
   slave_communication_start(); // 통신 시작
 
-<<<<<<< HEAD
-=======
-  // if (data == 0) {  // 긴급정지
-  //   dc_allstop();
-
-  //   data = 60;
-  // }
-
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
   if (data == 1) { // 평행주차
     while (data == 1) { // 앞으로 가면서 센서값 받아오기
       dc_gogogogo();
@@ -99,68 +90,40 @@ void loop() {
 
     if (data == 10) { // 왼쪽 공간 찾음
       delay(500);
-<<<<<<< HEAD
       for(uint8_t i = 0; i < 4; i++){ // 약간 후진
         dc_backbackbackback();
       }
 
       delay(2000); // 바퀴 회전 기다림
-=======
-      for(uint8_t i = 0; i < 8; i++){ // 약간 후진
-        dc_backbackbackback();
-      }
-
-      delay(1500); // 바퀴 회전 기다림
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
 
       while(data == 10) { // 왼쪽으로 이동
         dc_gobackbackgo();
       }
 
-<<<<<<< HEAD
       if (data == 11 || data == 30) { // 주차 완료
-=======
-      if (data == 11) { // 주차 완료
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         dc_allstop();
         
         data = 60; // data 값 초기화
       }
     } else if (data == 15) { // 오른쪽 공간 찾음
       delay(500);
-<<<<<<< HEAD
       for(uint8_t i = 0; i < 4; i++){ // 약간 후진
         dc_backbackbackback();
       }
 
       delay(2000); // 바퀴 회전 기다림
-=======
-      for(uint8_t i = 0; i < 8; i++){ // 약간 후진
-        dc_backbackbackback();
-      }
-
-      delay(1500); // 바퀴 회전 기다림
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
 
       while(data == 15) { // 오른쪽으로 이동
         dc_backgogoback();
       }
 
-<<<<<<< HEAD
       if (data == 16 || data == 30) { // 주차 완료
-=======
-      if (data == 16) { // 주차 완료
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         dc_allstop();
         
         data = 60; // data 값 초기화
       }
     }
-<<<<<<< HEAD
   } else if (data == 2) {   // T자 주차
-=======
-  } else if (data == 2) {
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
     while (data == 2) { // 앞으로 가면서 센서값 받아오기
       dc_gogogogo();
     }
@@ -173,7 +136,6 @@ void loop() {
 
     if (data == 20) { // 왼쪽 공간 찾음
       delay(500);
-<<<<<<< HEAD
       for(uint8_t i = 0; i < 3; i++){ // 약간 후진
         dc_backbackbackback();
       }
@@ -181,15 +143,6 @@ void loop() {
       delay(2000); // 바퀴 회전 기다림
 
       for(uint8_t i = 0; i < 9; i++){ // 90도 회전
-=======
-      for(uint8_t i = 0; i < 8; i++){ // 약간 후진
-        dc_backbackbackback();
-      }
-
-      delay(1500); // 바퀴 회전 기다림
-
-      for(uint8_t i = 0; i < 8; i++){ // 90도 회전
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         dc_backgobackgo();
       }
 
@@ -199,18 +152,13 @@ void loop() {
         dc_backbackbackback();
       }
 
-<<<<<<< HEAD
       if (data == 21 || data == 30) { // 주차 완료
-=======
-      if (data == 21) { // 주차 완료
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         dc_allstop();
         
         data = 60; // data 값 초기화
       }
     } else if (data == 25) { // 오른쪽 공간 찾음
       delay(500);
-<<<<<<< HEAD
       for(uint8_t i = 0; i < 3; i++){ // 약간 후진
         dc_backbackbackback();
       }
@@ -218,15 +166,6 @@ void loop() {
       delay(2000); // 바퀴 회전 기다림
 
       for(uint8_t i = 0; i < 9; i++){ // 90도 회전
-=======
-      for(uint8_t i = 0; i < 8; i++){ // 약간 후진
-        dc_backbackbackback();
-      }
-
-      delay(1500); // 바퀴 회전 기다림
-
-      for(uint8_t i = 0; i < 8; i++){ // 90도 회전
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         dc_gobackgoback();
       }
 
@@ -236,11 +175,7 @@ void loop() {
         dc_backbackbackback();
       }
 
-<<<<<<< HEAD
       if (data == 26 || data == 30) { // 주차 완료
-=======
-      if (data == 26) { // 주차 완료
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         dc_allstop();
         
         data = 60; // data 값 초기화
@@ -340,11 +275,7 @@ void dc_backgobackgo() {     // PWM 속도 적당히 조절 후 앞으로 돌리
   PORTD &=~ frontDC1;
   PORTB |= rearDC1left;
   PORTB &=~ rearDC2left;
-<<<<<<< HEAD
   for(uint8_t i = 0; i < 7; i++){
-=======
-  for(uint8_t i = 0; i < 8; i++){
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
     PORTB |= rearDCpwm;
     PORTD |= frontDCleftpwm;
     PORTD |= frontDCpwm;
@@ -368,11 +299,7 @@ void dc_gobackgoback() {     // PWM 속도 적당히 조절 후 앞으로 돌리
   PORTD &=~ frontDC2;
   PORTB |= rearDC2left;
   PORTB &=~ rearDC1left;
-<<<<<<< HEAD
   for(uint8_t i = 0; i < 7; i++){
-=======
-  for(uint8_t i = 0; i < 8; i++){
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
     PORTB |= rearDCpwm;
     PORTD |= frontDCleftpwm;
     PORTD |= frontDCpwm;
@@ -388,18 +315,6 @@ void dc_gobackgoback() {     // PWM 속도 적당히 조절 후 앞으로 돌리
 }
 
 void dc_allstop() {   //PWM 속도 적당히 조절하여 가만히 있도록 하기
-<<<<<<< HEAD
-=======
-  // PORTB &=~ rearDC2;
-  // PORTB &=~ rearDC1;
-  // PORTB &=~ rearDC2left;
-  // PORTB &=~ rearDC1left;  
-  // PORTD &=~ frontDC1left;
-  // PORTD &=~ frontDC2left;
-  // PORTD &=~ frontDC1;
-  // PORTD &=~ frontDC2;
-  // delay(1500);
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
   PORTB &= ~(rearDC2 | rearDC1 | rearDC2left | rearDC1left); 
   PORTD &= ~(frontDC1left | frontDC2left | frontDC1 | frontDC2);
   delay(1500);

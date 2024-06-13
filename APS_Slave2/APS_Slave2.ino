@@ -83,11 +83,7 @@ void loop() {
 
       while(data == 10); // 왼쪽 이동 기다림
 
-<<<<<<< HEAD
       if (data == 11 || data == 30) { // 이동 완료시
-=======
-      if (data == 11) { // 이동 완료시
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         delay(1000);
 
         servo_front_left_0();
@@ -95,14 +91,11 @@ void loop() {
         servo_rear_left_0();
         servo_rear_right_0();
 
-<<<<<<< HEAD
         servo_front_left_0();
         servo_front_right_0();
         servo_rear_left_0();
         servo_rear_right_0();
 
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         data = 60;
       }
     } else if (data == 15) { // 바퀴 회전
@@ -115,11 +108,7 @@ void loop() {
 
       while(data == 15); // 오른쪽 이동 기다림
 
-<<<<<<< HEAD
       if (data == 16 || data == 30) { // 이동 완료시
-=======
-      if (data == 16) { // 이동 완료시
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         delay(1000);
 
         servo_front_left_0();
@@ -127,14 +116,11 @@ void loop() {
         servo_rear_left_0();
         servo_rear_right_0();
 
-<<<<<<< HEAD
         servo_front_left_0();
         servo_front_right_0();
         servo_rear_left_0();
         servo_rear_right_0();
 
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         data = 60;
       }
     }
@@ -156,7 +142,6 @@ void loop() {
       servo_rear_left_0();
       servo_rear_right_0();
 
-<<<<<<< HEAD
       servo_front_left_0();
       servo_front_right_0();
       servo_rear_left_0();
@@ -165,11 +150,6 @@ void loop() {
       while(data == 20); // 후진 기다림
 
       if (data == 21 || data == 30) { // 주차 완료시
-=======
-      while(data == 20); // 후진 기다림
-
-      if (data == 21) { // 주차 완료시
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         delay(1000);
 
         servo_front_left_0();
@@ -177,14 +157,11 @@ void loop() {
         servo_rear_left_0();
         servo_rear_right_0();
 
-<<<<<<< HEAD
         servo_front_left_0();
         servo_front_right_0();
         servo_rear_left_0();
         servo_rear_right_0();
 
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         data = 60;
       }
     } else if (data == 25) {
@@ -202,7 +179,6 @@ void loop() {
       servo_rear_left_0();
       servo_rear_right_0();
 
-<<<<<<< HEAD
       servo_front_left_0();
       servo_front_right_0();
       servo_rear_left_0();
@@ -211,11 +187,6 @@ void loop() {
       while(data == 25); // 후진 기다림
 
       if (data == 26 || data == 30) { // 주차 완료시
-=======
-      while(data == 25); // 후진 기다림
-
-      if (data == 26) { // 주차 완료시
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         delay(1000);
 
         servo_front_left_0();
@@ -223,14 +194,11 @@ void loop() {
         servo_rear_left_0();
         servo_rear_right_0();
 
-<<<<<<< HEAD
         servo_front_left_0();
         servo_front_right_0();
         servo_rear_left_0();
         servo_rear_right_0();
 
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
         data = 60;
       }
     }
@@ -263,28 +231,19 @@ void servo_setup() {
   servo_front_right_0();
   servo_rear_left_0();
   servo_rear_right_0();
-<<<<<<< HEAD
 
   servo_front_left_0();
   servo_front_right_0();
   servo_rear_left_0();
   servo_rear_right_0();
-=======
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
 }
 
 void servo_front_left_0() { // 서보모터 기준도                     
    for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_LEFT_SERVO;
-<<<<<<< HEAD
     delayMicroseconds(1500);
     PORTD &=~ FRONT_LEFT_SERVO;
     delayMicroseconds(18500);
-=======
-    delayMicroseconds(1505);
-    PORTD &=~ FRONT_LEFT_SERVO;
-    delayMicroseconds(18495);
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
   }
 }
 
@@ -318,15 +277,9 @@ void servo_front_right_0() { // 서보모터 기준도
 void servo_front_right_90() { // 서보모터 왼90도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= FRONT_RIGHT_SERVO;
-<<<<<<< HEAD
     delayMicroseconds(500);
     PORTD &=~ FRONT_RIGHT_SERVO;
     delayMicroseconds(19500);
-=======
-    delayMicroseconds(480);
-    PORTD &=~ FRONT_RIGHT_SERVO;
-    delayMicroseconds(19520);
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
   }
 }
 
@@ -369,11 +322,7 @@ void servo_rear_left_60() { // 서보모터 60도
 void servo_rear_right_0() { // 서보모터 기준도                     
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_RIGHT_SERVO;
-<<<<<<< HEAD
     delayMicroseconds(1500);
-=======
-    delayMicroseconds(1490);
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
     PORTD &=~ REAR_RIGHT_SERVO;
     delayMicroseconds(18500);
   }
@@ -382,15 +331,9 @@ void servo_rear_right_0() { // 서보모터 기준도
 void servo_rear_right_90() { // 서보모터 오른90도
   for(uint8_t i = 0; i < 50; i++) {
     PORTD |= REAR_RIGHT_SERVO;
-<<<<<<< HEAD
     delayMicroseconds(2500);
     PORTD &=~ REAR_RIGHT_SERVO;
     delayMicroseconds(17500);
-=======
-    delayMicroseconds(2450);
-    PORTD &=~ REAR_RIGHT_SERVO;
-    delayMicroseconds(17550);
->>>>>>> 857a61e066f12ad9b0e94ddcb10aa9918409c131
   }
 }
 
